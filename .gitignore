@@ -1,2 +1,7 @@
 #hidden extensions
 .DS_Store
+
+.gitignore~
+
+CobraMILPSolver.log
+MILPProblem.mat
