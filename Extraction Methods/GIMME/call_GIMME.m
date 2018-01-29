@@ -15,7 +15,7 @@ function tissueModel = call_GIMME(model, expressionCol, threshold, obj_frac, tol
     tissueModel = removeRxns(model,remove); 
     inactiveRxns = CheckModelConsistency(tissueModel, tol);
     tissueModel = removeRxns(tissueModel,inactiveRxns);
-    tissueModel = removeNonUsedGenes(tissueModel);
+    tissueModel = removeUnusedGenes(tissueModel);
 end
 
 function [reactionActivity,reactionActivityIrrev,model2gimme,gimmeSolution] = solveGimme(model,objectiveCol,expressionCol,cutoff)

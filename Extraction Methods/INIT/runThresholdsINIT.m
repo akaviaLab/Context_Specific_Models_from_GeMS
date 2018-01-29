@@ -1,22 +1,23 @@
 function runThresholdsINIT(figName, bb, modName)
-initCobraToolbox
-load(['parsedGPR_u_',modName,'.mat'])
-load(['model_u_',modName,'.mat'])
-load(['gene_expr_u_',modName,'.mat'])
-load(['gene_id_u_',modName,'.mat'])
-load(['corrRxn_u_',modName,'.mat'])
-load(['parsedGPR_c_',modName,'.mat'])
-load(['model_c_',modName,'.mat'])
-load(['gene_expr_c_',modName,'.mat'])
-load(['gene_id_c_',modName,'.mat'])
-load(['corrRxn_c_',modName,'.mat'])
-load(['ths_',modName,'.mat'])
-load(['model_s_',modName,'.mat'])
-load(['gene_expr_s_',modName,'.mat'])
-load(['gene_id_s_',modName,'.mat'])
-load(['corrRxn_s_',modName,'.mat'])
-load(['parsedGPR_s_',modName,'.mat'])
-load(['growthRate_',modName,'.mat'])
+%initCobraToolbox
+load(['ID_FPKM_', modName, '.mat'], 'num');
+load(['model_u_',modName,'.mat'], 'model_u')
+[~, indModel, indNum] = intersect(cellfun(@str2num, model_u.genes), num(:, 1));
+expressionData_u.gene(1:length(indModel)) = model_u.genes(indModel);
+expressionData_u.value(1:length(indNum)) = num(indNum, 2);
+
+load(['model_c_',modName,'.mat'], 'model_c')
+[~, indModel, indNum] = intersect(cellfun(@str2num, model_c.genes), num(:, 1));
+expressionData_c.gene(1:length(indModel)) = model_c.genes(indModel);
+expressionData_c.value(1:length(indNum)) = num(indNum, 2);
+
+load(['model_s_',modName,'.mat'], 'model_s')
+[~, indModel, indNum] = intersect(cellfun(@str2num, model_s.genes), num(:, 1));
+expressionData_c.gene(1:length(indModel)) = model_s.genes(indModel);
+expressionData_c.value(1:length(indNum)) = num(indNum, 2);
+
+load(['growthRate_',modName,'.mat'], 'blb')
+load(['gene_threshold_',modName,'.mat'], 'ths')
 
 if strcmp(figName,'U')
     tol = 1e-6;
@@ -30,7 +31,7 @@ if strcmp(figName,'U')
         bmsInd=~cellfun(@isempty,strfind(model.rxns,'BMS_'));
         figName = [figName,'F'];
     end
-    expressionCol = mapGeneToRxn(model, gene_id_u, gene_expr_u, parsedGPR_u, corrRxn_u);
+    expressionCol = mapExpressionToReactions(model_u, expressionData_u);
 end
 
 if strcmp(figName,'C')
@@ -49,7 +50,7 @@ if strcmp(figName,'C')
         model = changeRxnBounds(model_c, 'Biomass_reaction', 1e-3, 'l'); %Force biomass and ATP demand to be active
         figName = [figName,'H'];
     end
-    expressionCol = mapGeneToRxn(model, gene_id_c, gene_expr_c, parsedGPR_c, corrRxn_c);
+    expressionCol = mapExpressionToReactions(model_c, expressionData_c);
 end
 
 if strcmp(figName,'S')
@@ -64,7 +65,7 @@ if strcmp(figName,'S')
         bmsInd=~cellfun(@isempty,strfind(model.rxns,'BMS_'));
         figName = [figName,'F'];
     end
-    expressionCol = mapGeneToRxn(model, gene_id_s, gene_expr_s, parsedGPR_s, corrRxn_s);
+    expressionCol = mapExpressionToReactions(model_s, expressionData_s);
 end
 
 
@@ -113,37 +114,39 @@ end
 if strcmp(figName,'UB') || strcmp(figName,'UF')
     %UNCONSTRAINED
     epsil = 1;
-    run_INIT(model, gene_expr_u, gene_id_u, ths.p25, figName, epsil, w1, 1, modName, tol, runtime);
-    run_INIT(model, gene_expr_u, gene_id_u, ths.p50, figName, epsil, w2, 2, modName, tol, runtime);
-    run_INIT(model, gene_expr_u, gene_id_u, ths.p10, figName, epsil, w3, 3, modName, tol, runtime);
-    run_INIT(model, gene_expr_u, gene_id_u, ths.mean, figName, epsil, w4, 4, modName, tol, runtime);
+    run_INIT(model,ths.p25, figName, epsil, w1, 1, modName, tol, runtime);
+    run_INIT(model,ths.p50, figName, epsil, w2, 2, modName, tol, runtime);
+    run_INIT(model,ths.p10, figName, epsil, w3, 3, modName, tol, runtime);
+    run_INIT(model,ths.mean, figName, epsil, w4, 4, modName, tol, runtime);
 end
 
 if strcmp(figName,'CB') || strcmp(figName,'CF') || strcmp(figName,'CH')
     %CONSTRAINED
     epsil = 1e-6;
-    run_INIT(model, gene_expr_c, gene_id_c, ths.p25, figName, epsil, w1, 1, modName, tol, runtime);
-    run_INIT(model, gene_expr_c, gene_id_c, ths.p50, figName, epsil, w2, 2, modName, tol, runtime);
-    run_INIT(model, gene_expr_c, gene_id_c, ths.p10, figName, epsil, w3, 3, modName, tol, runtime);
-    run_INIT(model, gene_expr_c, gene_id_c, ths.mean, figName, epsil, w4, 4, modName, tol, runtime);
+    run_INIT(model,ths.p25, figName, epsil, w1, 1, modName, tol, runtime);
+    run_INIT(model,ths.p50, figName, epsil, w2, 2, modName, tol, runtime);
+    run_INIT(model,ths.p10, figName, epsil, w3, 3, modName, tol, runtime);
+    run_INIT(model,ths.mean, figName, epsil, w4, 4, modName, tol, runtime);
 end
 if strcmp(figName,'SB') || strcmp(figName,'SF')
     %SEMI-CONSTRAINED
     epsil = 1;
-    run_INIT(model, gene_expr_s, gene_id_s, ths.p25, figName, epsil, w1, 1, modName, tol, runtime);
-    run_INIT(model, gene_expr_s, gene_id_s, ths.p50, figName, epsil, w2, 2, modName, tol, runtime);
-    run_INIT(model, gene_expr_s, gene_id_s, ths.p10, figName, epsil, w3, 3, modName, tol, runtime);
-    run_INIT(model, gene_expr_s, gene_id_s, ths.mean, figName, epsil, w4, 4, modName, tol, runtime);
+    run_INIT(model,ths.p25, figName, epsil, w1, 1, modName, tol, runtime);
+    run_INIT(model,ths.p50, figName, epsil, w2, 2, modName, tol, runtime);
+    run_INIT(model,ths.p10, figName, epsil, w3, 3, modName, tol, runtime);
+    run_INIT(model,ths.mean, figName, epsil, w4, 4, modName, tol, runtime);
 
 end
 exit;
 end
 
-function run_INIT(model, gene_exp, gene_names, th, figName, epsil, w, id, modName, tol, runtime)
+function run_INIT(model, ~, figName, ~, w, id, modName, tol, runtime)
     tName = ['INIT_',figName, num2str(id),'_',modName];
     disp(tName)
-    cMod = call_INIT(model, epsil, w, tol, [tName,'.txt'], runtime);
+    optionsLocal = struct('weights', w, 'tol', tol, 'runtime', runtime');
+    optionsLocal.solver = 'INIT';
+    optionsLocal.logfile = [tName,'.txt'];
+    cMod = createTissueSpecificModel(model, optionsLocal, 1);
     cMod.name = tName;
-    eval([tName,'= addMinGeneField(cMod, gene_exp, gene_names, th, 1);']);
     save([tName,'.mat'],tName)
 end

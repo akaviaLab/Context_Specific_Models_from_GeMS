@@ -1,24 +1,22 @@
-function runThresholdsMBA(figName, bb, modName, ext)
-initCobraToolbox
-load(['parsedGPR_u_',modName,'.mat'])
-load(['model_u_',modName,'.mat'])
-load(['gene_expr_u_',modName,'.mat'])
-load(['gene_id_u_',modName,'.mat'])
-load(['corrRxn_u_',modName,'.mat'])
-load(['parsedGPR_c_',modName,'.mat'])
-load(['model_c_',modName,'.mat'])
-load(['gene_expr_c_',modName,'.mat'])
-load(['gene_id_c_',modName,'.mat'])
-load(['corrRxn_c_',modName,'.mat'])
-load(['ths_',modName,'.mat'])
-load(['model_s_',modName,'.mat'])
-load(['gene_expr_s_',modName,'.mat'])
-load(['gene_id_s_',modName,'.mat'])
-load(['corrRxn_s_',modName,'.mat'])
-load(['parsedGPR_s_',modName,'.mat'])
-load(['growthRate_',modName,'.mat'])
+function runThresholdsMBA(figName, bb, modName)
+load(['ID_FPKM_', modName, '.mat'], 'num');
+load(['model_u_',modName,'.mat'], 'model_u')
+[~, indModel, indNum] = intersect(cellfun(@str2num, model_u.genes), num(:, 1));
+expressionData_u.gene(1:length(indModel)) = model_u.genes(indModel);
+expressionData_u.value(1:length(indNum)) = num(indNum, 2);
 
-ext = num2str(ext);
+load(['model_c_',modName,'.mat'], 'model_c')
+[~, indModel, indNum] = intersect(cellfun(@str2num, model_c.genes), num(:, 1));
+expressionData_c.gene(1:length(indModel)) = model_c.genes(indModel);
+expressionData_c.value(1:length(indNum)) = num(indNum, 2);
+
+load(['model_s_',modName,'.mat'], 'model_s')
+[~, indModel, indNum] = intersect(cellfun(@str2num, model_s.genes), num(:, 1));
+expressionData_c.gene(1:length(indModel)) = model_s.genes(indModel);
+expressionData_c.value(1:length(indNum)) = num(indNum, 2);
+
+load(['growthRate_',modName,'.mat'], 'blb')
+load(['gene_threshold_',modName,'.mat'], 'ths')
 
 if strcmp(figName,'U')
     %UNCONSTRAINED
@@ -33,18 +31,17 @@ if strcmp(figName,'U')
         model_u = addBiomassSinks(model_u);
         figName = [figName,'F'];
     end
-    expressionCol = mapGeneToRxn(model_u, gene_id_u, gene_expr_u, parsedGPR_u, corrRxn_u);
-    epsil = 0.5;
-    run_MBA(core, model_u, gene_expr_u, gene_id_u, expressionCol, figName, epsil, ths.p10, ths.p10, 1, modName, ext, tol)
-    run_MBA(core, model_u, gene_expr_u, gene_id_u, expressionCol, figName, epsil, ths.mean, ths.mean, 2, modName, ext, tol)
-    run_MBA(core, model_u, gene_expr_u, gene_id_u, expressionCol, figName, epsil, ths.p25, ths.p25, 3, modName, ext, tol)
-    run_MBA(core, model_u, gene_expr_u, gene_id_u, expressionCol, figName, epsil, ths.p50, ths.p50, 4, modName, ext, tol)
-    run_MBA(core, model_u, gene_expr_u, gene_id_u, expressionCol, figName, epsil, ths.mean, ths.p10, 5, modName, ext, tol)
-    run_MBA(core, model_u, gene_expr_u, gene_id_u, expressionCol, figName, epsil, ths.p25, ths.p10, 6, modName, ext, tol)
-    run_MBA(core, model_u, gene_expr_u, gene_id_u, expressionCol, figName, epsil, ths.p50, ths.p10, 7, modName, ext, tol)
-    run_MBA(core, model_u, gene_expr_u, gene_id_u, expressionCol, figName, epsil, ths.p25, ths.mean, 8, modName, ext, tol)
-    run_MBA(core, model_u, gene_expr_u, gene_id_u, expressionCol, figName, epsil, ths.p50, ths.mean, 9, modName, ext, tol)
-    run_MBA(core, model_u, gene_expr_u, gene_id_u, expressionCol, figName, epsil, ths.p50, ths.p25, 10, modName, ext, tol)
+     expressionCol = mapExpressionToReactions(model_u, expressionData_u);
+    run_MBA(core, model_u, expressionCol, figName, ths.p10, ths.p10, 1, modName, tol)
+    run_MBA(core, model_u, expressionCol, figName, ths.mean, ths.mean, 2, modName, tol)
+    run_MBA(core, model_u, expressionCol, figName, ths.p25, ths.p25, 3, modName, tol)
+    run_MBA(core, model_u, expressionCol, figName, ths.p50, ths.p50, 4, modName, tol)
+    run_MBA(core, model_u, expressionCol, figName, ths.mean, ths.p10, 5, modName, tol)
+    run_MBA(core, model_u, expressionCol, figName, ths.p25, ths.p10, 6, modName, tol)
+    run_MBA(core, model_u, expressionCol, figName, ths.p50, ths.p10, 7, modName, tol)
+    run_MBA(core, model_u, expressionCol, figName, ths.p25, ths.mean, 8, modName, tol)
+    run_MBA(core, model_u, expressionCol, figName, ths.p50, ths.mean, 9, modName, tol)
+    run_MBA(core, model_u, expressionCol, figName, ths.p50, ths.p25, 10, modName, tol)
 end
 
 if strcmp(figName,'C')
@@ -65,18 +62,17 @@ if strcmp(figName,'C')
         core = {'Biomass_reaction','DM_atp(c)'};
         figName = [figName,'H'];
     end
-    epsil = 0.5;
-    expressionCol = mapGeneToRxn(model_c, gene_id_c, gene_expr_c, parsedGPR_c, corrRxn_c);
-    run_MBA(core, model_c, gene_expr_c, gene_id_c, expressionCol, figName, epsil, ths.p10, ths.p10, 1, modName, ext, tol)
-    run_MBA(core, model_c, gene_expr_c, gene_id_c, expressionCol, figName, epsil, ths.mean, ths.mean, 2, modName, ext, tol)
-    run_MBA(core, model_c, gene_expr_c, gene_id_c, expressionCol, figName, epsil, ths.p25, ths.p25, 3, modName, ext, tol)
-    run_MBA(core, model_c, gene_expr_c, gene_id_c, expressionCol, figName, epsil, ths.p50, ths.p50, 4, modName, ext, tol)
-    run_MBA(core, model_c, gene_expr_c, gene_id_c, expressionCol, figName, epsil, ths.mean, ths.p10, 5, modName, ext, tol)
-    run_MBA(core, model_c, gene_expr_c, gene_id_c, expressionCol, figName, epsil, ths.p25, ths.p10, 6, modName, ext, tol)
-    run_MBA(core, model_c, gene_expr_c, gene_id_c, expressionCol, figName, epsil, ths.p50, ths.p10, 7, modName, ext, tol)
-    run_MBA(core, model_c, gene_expr_c, gene_id_c, expressionCol, figName, epsil, ths.p25, ths.mean, 8, modName, ext, tol)
-    run_MBA(core, model_c, gene_expr_c, gene_id_c, expressionCol, figName, epsil, ths.p50, ths.mean, 9, modName, ext, tol)
-    run_MBA(core, model_c, gene_expr_c, gene_id_c, expressionCol, figName, epsil, ths.p50, ths.p25, 10, modName, ext, tol)
+    expressionCol = mapExpressionToReactions(model_c, expressionData_c);
+    run_MBA(core, model_c, expressionCol, figName, ths.p10, ths.p10, 1, modName, tol)
+    run_MBA(core, model_c, expressionCol, figName, ths.mean, ths.mean, 2, modName, tol)
+    run_MBA(core, model_c, expressionCol, figName, ths.p25, ths.p25, 3, modName, tol)
+    run_MBA(core, model_c, expressionCol, figName, ths.p50, ths.p50, 4, modName, tol)
+    run_MBA(core, model_c, expressionCol, figName, ths.mean, ths.p10, 5, modName, tol)
+    run_MBA(core, model_c, expressionCol, figName, ths.p25, ths.p10, 6, modName, tol)
+    run_MBA(core, model_c, expressionCol, figName, ths.p50, ths.p10, 7, modName, tol)
+    run_MBA(core, model_c, expressionCol, figName, ths.p25, ths.mean, 8, modName, tol)
+    run_MBA(core, model_c, expressionCol, figName, ths.p50, ths.mean, 9, modName, tol)
+    run_MBA(core, model_c, expressionCol, figName, ths.p50, ths.p25, 10, modName, tol)
 end
 if strcmp(figName,'S')
     %SEMI-CONSTRAINED
@@ -91,34 +87,40 @@ if strcmp(figName,'S')
         model_s = addBiomassSinks(model_s);
         figName = [figName,'F'];
     end
-    epsil = 0.5;
-    expressionCol = mapGeneToRxn(model_s, gene_id_s, gene_expr_s, parsedGPR_s, corrRxn_s);
-    run_MBA(core, model_s, gene_expr_s, gene_id_s, expressionCol, figName, epsil, ths.p10, ths.p10, 1, modName, ext, tol)
-    run_MBA(core, model_s, gene_expr_s, gene_id_s, expressionCol, figName, epsil, ths.mean, ths.mean, 2, modName, ext, tol)
-    run_MBA(core, model_s, gene_expr_s, gene_id_s, expressionCol, figName, epsil, ths.p25, ths.p25, 3, modName, ext, tol)
-    run_MBA(core, model_s, gene_expr_s, gene_id_s, expressionCol, figName, epsil, ths.p50, ths.p50, 4, modName, ext, tol)
-    run_MBA(core, model_s, gene_expr_s, gene_id_s, expressionCol, figName, epsil, ths.mean, ths.p10, 5, modName, ext, tol)
-    run_MBA(core, model_s, gene_expr_s, gene_id_s, expressionCol, figName, epsil, ths.p25, ths.p10, 6, modName, ext, tol)
-    run_MBA(core, model_s, gene_expr_s, gene_id_s, expressionCol, figName, epsil, ths.p50, ths.p10, 7, modName, ext, tol)
-    run_MBA(core, model_s, gene_expr_s, gene_id_s, expressionCol, figName, epsil, ths.p25, ths.mean, 8, modName, ext, tol)
-    run_MBA(core, model_s, gene_expr_s, gene_id_s, expressionCol, figName, epsil, ths.p50, ths.mean, 9, modName, ext, tol)
-    run_MBA(core, model_s, gene_expr_s, gene_id_s, expressionCol, figName, epsil, ths.p50, ths.p25, 10, modName, ext, tol)
+     expressionCol = mapExpressionToReactions(model_s, expressionData_s);
+    run_MBA(core, model_s, expressionCol, figName, ths.p10, ths.p10, 1, modName, tol)
+    run_MBA(core, model_s, expressionCol, figName, ths.mean, ths.mean, 2, modName, tol)
+    run_MBA(core, model_s, expressionCol, figName, ths.p25, ths.p25, 3, modName, tol)
+    run_MBA(core, model_s, expressionCol, figName, ths.p50, ths.p50, 4, modName, tol)
+    run_MBA(core, model_s, expressionCol, figName, ths.mean, ths.p10, 5, modName, tol)
+    run_MBA(core, model_s, expressionCol, figName, ths.p25, ths.p10, 6, modName, tol)
+    run_MBA(core, model_s, expressionCol, figName, ths.p50, ths.p10, 7, modName, tol)
+    run_MBA(core, model_s, expressionCol, figName, ths.p25, ths.mean, 8, modName, tol)
+    run_MBA(core, model_s, expressionCol, figName, ths.p50, ths.mean, 9, modName, tol)
+    run_MBA(core, model_s, expressionCol, figName, ths.p50, ths.p25, 10, modName, tol)
 end
 exit;
 end
 
-function run_MBA(core, model, gene_exp, gene_names, expressionCol, figName, epsil, mt, ut, id, modName, ext, tol)
-    tName = ['MBA',ext,'_',figName, num2str(id),'_',modName];
+function run_MBA(core, model, expressionCol, figName, mt, ut, id, modName, tol)
+    paramConsistency.epsilon=1e-10;
+    paramConsistency.modeFlag=0;
+    paramConsistency.method='fastcc';
+    tName = ['MBA','_',figName, num2str(id),'_',modName];
     disp(tName)
     %Make sure output model is consistent, if not, run again
     incon = true;
     nrun = 0;
     while incon && nrun < 10
-        cMod = call_MBA(model, expressionCol, core, mt, ut, epsil, tol);
+            indH = find(expressionCol > ut);
+    indM = find(expressionCol >= mt & expressionCol <= ut);
+    CH = union(model.rxns(indH),core); %#ok<FNDSB>
+    CM = model.rxns(indM); %#ok<FNDSB>
+        cMod = MBA(model, CM, CH, tol);
         nrun = nrun + 1;
-        inactiveRxns = CheckModelConsistency(cMod, tol);
-        if isempty(inactiveRxns)
-            incon = false;
+        [~,~, ~, fluxInConsistentRxnBool] = findFluxConsistentSubset(cMod,paramConsistency);
+        if (sum(fluxInConsistentRxnBool) == 0)
+              incon = false;
         end
     end
     if incon
@@ -127,7 +129,6 @@ function run_MBA(core, model, gene_exp, gene_names, expressionCol, figName, epsi
     end
     disp(['Number of rxns: ',num2str(numel(cMod.rxns))])
     cMod.name = tName;
-    eval([tName,'= addMinGeneField(cMod, gene_exp, gene_names, mt, 1);']);
     save([tName,'.mat'],tName)
     disp(' ')
 end

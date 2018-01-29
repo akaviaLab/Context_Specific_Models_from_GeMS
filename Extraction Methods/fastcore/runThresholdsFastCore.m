@@ -1,7 +1,7 @@
 function runThresholdsFastCore(figName, bb, modName)
     %initCobraToolbox
-    load(['ID_FPKM_', modName, '.mat'], 'num');
-    load(['model_u_',modName,'.mat'], 'model_u')
+        load(['ID_FPKM_', modName, '.mat'], 'num');
+        load(['model_u_',modName,'.mat'], 'model_u')
     % This loads up the gene expression based on the FPKM file, so it has
     % the option of dealing with more reactions. There are three genes
     % (2878, 4259, 5337)
@@ -44,10 +44,10 @@ function runThresholdsFastCore(figName, bb, modName)
         epsil = 1e-6;
         scaling = 1e3;
         expressionCol = mapExpressionToReactions(model_u, expressionData_u);
-        singleRun(core, expressionCol, figName, model_u, epsil, scaling, ths.p10, 1, modName)
-        singleRun(core, expressionCol, figName, model_u, epsil, scaling, ths.mean, 2, modName)
-        singleRun(core, expressionCol, figName, model_u, epsil, scaling, ths.p25, 3, modName)
-        singleRun(core, expressionCol, figName, model_u, epsil, scaling, ths.p50, 4, modName)
+        singleRun(core, expressionCol, figName, model_u, epsil, ths.p10, 1, modName)
+        singleRun(core, expressionCol, figName, model_u, epsil, ths.mean, 2, modName)
+        singleRun(core, expressionCol, figName, model_u, epsil, ths.p25, 3, modName)
+        singleRun(core, expressionCol, figName, model_u, epsil, ths.p50, 4, modName)
     end
 
     if strcmp(figName,'C')
@@ -70,10 +70,10 @@ function runThresholdsFastCore(figName, bb, modName)
         epsil = 1e-8;
         scaling = 1e3;
         expressionCol = mapExpressionToReactions(model_c, expressionData_c);
-        singleRun(core, expressionCol, figName, model_c, epsil, scaling, ths.p10, 1, modName)
-        singleRun(core, expressionCol, figName, model_c, epsil, scaling, ths.mean, 2, modName)
-        singleRun(core, expressionCol, figName, model_c, epsil, scaling, ths.p25, 3, modName)
-        singleRun(core, expressionCol, figName, model_c, epsil, scaling, ths.p50, 4, modName)
+        singleRun(core, expressionCol, figName, model_c, epsil, ths.p10, 1, modName)
+        singleRun(core, expressionCol, figName, model_c, epsil, ths.mean, 2, modName)
+        singleRun(core, expressionCol, figName, model_c, epsil, ths.p25, 3, modName)
+        singleRun(core, expressionCol, figName, model_c, epsil, ths.p50, 4, modName)
     end
     
     if strcmp(figName,'S')
@@ -89,12 +89,11 @@ function runThresholdsFastCore(figName, bb, modName)
             figName = [figName,'F'];
         end
         epsil = 1e-6;
-        scaling = 1e3;
         expressionCol = mapExpressionToReactions(model_s, expressionData_s);
-        singleRun(core, gene_expr_s, gene_id_s, expressionCol, figName, model_s, epsil, scaling, ths.p10, 1, modName)
-        singleRun(core, gene_expr_s, gene_id_s, expressionCol, figName, model_s, epsil, scaling, ths.mean, 2, modName)
-        singleRun(core, gene_expr_s, gene_id_s, expressionCol, figName, model_s, epsil, scaling, ths.p25, 3, modName)
-        singleRun(core, gene_expr_s, gene_id_s, expressionCol, figName, model_s, epsil, scaling, ths.p50, 4, modName)
+        singleRun(core, expressionCol, figName, model_s, epsil, ths.p10, 1, modName)
+        singleRun(core, expressionCol, figName, model_s, epsil, ths.mean, 2, modName)
+        singleRun(core, expressionCol, figName, model_s, epsil, ths.p25, 3, modName)
+        singleRun(core, expressionCol, figName, model_s, epsil, ths.p50, 4, modName)
     end
 
 end
@@ -106,5 +105,5 @@ function singleRun(core, expressionCol, figName, model, epsil, th, id, modName)
     C = union(C, find(ismember(model.rxns, core)));
     cMod = fastcore(model, C, epsil);
     cMod.name = tName;
-    save([tName,'.mat'],tName)
+    writeCbModel(cMod, 'mat', tName);
 end

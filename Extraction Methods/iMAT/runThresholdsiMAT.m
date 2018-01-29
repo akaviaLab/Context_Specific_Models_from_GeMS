@@ -1,23 +1,24 @@
 function runThresholdsiMAT(figName, bb, modName)
 
 initCobraToolbox
-load(['parsedGPR_u_',modName,'.mat'])
-load(['model_u_',modName,'.mat'])
-load(['gene_expr_u_',modName,'.mat'])
-load(['gene_id_u_',modName,'.mat'])
-load(['corrRxn_u_',modName,'.mat'])
-load(['parsedGPR_c_',modName,'.mat'])
-load(['model_c_',modName,'.mat'])
-load(['gene_expr_c_',modName,'.mat'])
-load(['gene_id_c_',modName,'.mat'])
-load(['corrRxn_c_',modName,'.mat'])
-load(['ths_',modName,'.mat'])
-load(['model_s_',modName,'.mat'])
-load(['gene_expr_s_',modName,'.mat'])
-load(['gene_id_s_',modName,'.mat'])
-load(['corrRxn_s_',modName,'.mat'])
-load(['parsedGPR_s_',modName,'.mat'])
-load(['growthRate_',modName,'.mat'])
+load(['ID_FPKM_', modName, '.mat'], 'num');
+load(['model_u_',modName,'.mat'], 'model_u')
+[~, indModel, indNum] = intersect(cellfun(@str2num, model_u.genes), num(:, 1));
+expressionData_u.gene(1:length(indModel)) = model_u.genes(indModel);
+expressionData_u.value(1:length(indNum)) = num(indNum, 2);
+
+load(['model_c_',modName,'.mat'], 'model_c')
+[~, indModel, indNum] = intersect(cellfun(@str2num, model_c.genes), num(:, 1));
+expressionData_c.gene(1:length(indModel)) = model_c.genes(indModel);
+expressionData_c.value(1:length(indNum)) = num(indNum, 2);
+
+load(['model_s_',modName,'.mat'], 'model_s')
+[~, indModel, indNum] = intersect(cellfun(@str2num, model_s.genes), num(:, 1));
+expressionData_c.gene(1:length(indModel)) = model_s.genes(indModel);
+expressionData_c.value(1:length(indNum)) = num(indNum, 2);
+
+load(['growthRate_',modName,'.mat'], 'blb')
+load(['gene_threshold_',modName,'.mat'], 'ths')
 
 if strcmp(figName,'U')
     %UNCONSTRAINED
@@ -33,18 +34,18 @@ if strcmp(figName,'U')
         model_u = addBiomassSinks(model_u);
         figName = [figName,'F'];
     end
-    expressionCol = mapGeneToRxn(model_u, gene_id_u, gene_expr_u, parsedGPR_u, corrRxn_u);
+    expressionCol = mapExpressionToReactions(model_u, expressionData_u);
     epsil = 1;
-    run_iMat(core, model_u, gene_expr_u, gene_id_u, expressionCol, figName, epsil, ths.p10, ths.p10, 1, modName, tol, runtime)
-    run_iMat(core, model_u, gene_expr_u, gene_id_u, expressionCol, figName, epsil, ths.mean, ths.mean, 2, modName, tol, runtime)
-    run_iMat(core, model_u, gene_expr_u, gene_id_u, expressionCol, figName, epsil, ths.p25, ths.p25, 3, modName, tol, runtime)
-    run_iMat(core, model_u, gene_expr_u, gene_id_u, expressionCol, figName, epsil, ths.p50, ths.p50, 4, modName, tol, runtime)
-    run_iMat(core, model_u, gene_expr_u, gene_id_u, expressionCol, figName, epsil, ths.mean, ths.p10, 5, modName, tol, runtime)
-    run_iMat(core, model_u, gene_expr_u, gene_id_u, expressionCol, figName, epsil, ths.p25, ths.p10, 6, modName, tol, runtime)
-    run_iMat(core, model_u, gene_expr_u, gene_id_u, expressionCol, figName, epsil, ths.p50, ths.p10, 7, modName, tol, runtime)
-    run_iMat(core, model_u, gene_expr_u, gene_id_u, expressionCol, figName, epsil, ths.p25, ths.mean, 8, modName, tol, runtime)
-    run_iMat(core, model_u, gene_expr_u, gene_id_u, expressionCol, figName, epsil, ths.p50, ths.mean, 9, modName, tol, runtime)
-    run_iMat(core, model_u, gene_expr_u, gene_id_u, expressionCol, figName, epsil, ths.p50, ths.p25, 10, modName, tol, runtime)
+    run_iMat(core, model_u, expressionCol, figName, epsil, ths.p10, ths.p10, 1, modName, tol, runtime)
+    run_iMat(core, model_u, expressionCol, figName, epsil, ths.mean, ths.mean, 2, modName, tol, runtime)
+    run_iMat(core, model_u, expressionCol, figName, epsil, ths.p25, ths.p25, 3, modName, tol, runtime)
+    run_iMat(core, model_u, expressionCol, figName, epsil, ths.p50, ths.p50, 4, modName, tol, runtime)
+    run_iMat(core, model_u, expressionCol, figName, epsil, ths.mean, ths.p10, 5, modName, tol, runtime)
+    run_iMat(core, model_u, expressionCol, figName, epsil, ths.p25, ths.p10, 6, modName, tol, runtime)
+    run_iMat(core, model_u, expressionCol, figName, epsil, ths.p50, ths.p10, 7, modName, tol, runtime)
+    run_iMat(core, model_u, expressionCol, figName, epsil, ths.p25, ths.mean, 8, modName, tol, runtime)
+    run_iMat(core, model_u, expressionCol, figName, epsil, ths.p50, ths.mean, 9, modName, tol, runtime)
+    run_iMat(core, model_u, expressionCol, figName, epsil, ths.p50, ths.p25, 10, modName, tol, runtime)
 end
 
 if strcmp(figName,'C')
@@ -66,18 +67,18 @@ if strcmp(figName,'C')
         core = {'Biomass_reaction','DM_atp(c)'};
         figName = [figName,'H'];
     end
-    expressionCol = mapGeneToRxn(model_c, gene_id_c, gene_expr_c, parsedGPR_c, corrRxn_c);
-    epsil = 1e-6;    
-    run_iMat(core, model_c, gene_expr_c, gene_id_c, expressionCol, figName, epsil, ths.p10, ths.p10, 1, modName, tol, runtime)
-    run_iMat(core, model_c, gene_expr_c, gene_id_c, expressionCol, figName, epsil, ths.mean, ths.mean, 2, modName, tol, runtime)
-    run_iMat(core, model_c, gene_expr_c, gene_id_c, expressionCol, figName, epsil, ths.p25, ths.p25, 3, modName, tol, runtime)
-    run_iMat(core, model_c, gene_expr_c, gene_id_c, expressionCol, figName, epsil, ths.p50, ths.p50, 4, modName, tol, runtime)
-    run_iMat(core, model_c, gene_expr_c, gene_id_c, expressionCol, figName, epsil, ths.mean, ths.p10, 5, modName, tol, runtime)
-    run_iMat(core, model_c, gene_expr_c, gene_id_c, expressionCol, figName, epsil, ths.p25, ths.p10, 6, modName, tol, runtime)
-    run_iMat(core, model_c, gene_expr_c, gene_id_c, expressionCol, figName, epsil, ths.p50, ths.p10, 7, modName, tol, runtime)
-    run_iMat(core, model_c, gene_expr_c, gene_id_c, expressionCol, figName, epsil, ths.p25, ths.mean, 8, modName, tol, runtime)
-    run_iMat(core, model_c, gene_expr_c, gene_id_c, expressionCol, figName, epsil, ths.p50, ths.mean, 9, modName, tol, runtime)
-    run_iMat(core, model_c, gene_expr_c, gene_id_c, expressionCol, figName, epsil, ths.p50, ths.p25, 10, modName, tol, runtime)
+    expressionCol = mapExpressionToReactions(model_c, expressionData_c);
+        epsil = 1e-6;    
+    run_iMat(core, model_c, expressionCol, figName, epsil, ths.p10, ths.p10, 1, modName, tol, runtime)
+    run_iMat(core, model_c, expressionCol, figName, epsil, ths.mean, ths.mean, 2, modName, tol, runtime)
+    run_iMat(core, model_c, expressionCol, figName, epsil, ths.p25, ths.p25, 3, modName, tol, runtime)
+    run_iMat(core, model_c, expressionCol, figName, epsil, ths.p50, ths.p50, 4, modName, tol, runtime)
+    run_iMat(core, model_c, expressionCol, figName, epsil, ths.mean, ths.p10, 5, modName, tol, runtime)
+    run_iMat(core, model_c, expressionCol, figName, epsil, ths.p25, ths.p10, 6, modName, tol, runtime)
+    run_iMat(core, model_c, expressionCol, figName, epsil, ths.p50, ths.p10, 7, modName, tol, runtime)
+    run_iMat(core, model_c, expressionCol, figName, epsil, ths.p25, ths.mean, 8, modName, tol, runtime)
+    run_iMat(core, model_c, expressionCol, figName, epsil, ths.p50, ths.mean, 9, modName, tol, runtime)
+    run_iMat(core, model_c, expressionCol, figName, epsil, ths.p50, ths.p25, 10, modName, tol, runtime)
 end
 
 if strcmp(figName,'S')
@@ -94,27 +95,34 @@ if strcmp(figName,'S')
         model_s = addBiomassSinks(model_s);
         figName = [figName,'F'];
     end
-    expressionCol = mapGeneToRxn(model_s, gene_id_s, gene_expr_s, parsedGPR_s, corrRxn_s);
-    epsil = 1;  
-    run_iMat(core, model_s, gene_expr_s, gene_id_s, expressionCol, figName, epsil, ths.p10, ths.p10, 1, modName, tol, runtime)
-    run_iMat(core, model_s, gene_expr_s, gene_id_s, expressionCol, figName, epsil, ths.mean, ths.mean, 2, modName, tol, runtime)
-    run_iMat(core, model_s, gene_expr_s, gene_id_s, expressionCol, figName, epsil, ths.p25, ths.p25, 3, modName, tol, runtime)
-    run_iMat(core, model_s, gene_expr_s, gene_id_s, expressionCol, figName, epsil, ths.p50, ths.p50, 4, modName, tol, runtime)
-    run_iMat(core, model_s, gene_expr_s, gene_id_s, expressionCol, figName, epsil, ths.mean, ths.p10, 5, modName, tol, runtime)
-    run_iMat(core, model_s, gene_expr_s, gene_id_s, expressionCol, figName, epsil, ths.p25, ths.p10, 6, modName, tol, runtime)
-    run_iMat(core, model_s, gene_expr_s, gene_id_s, expressionCol, figName, epsil, ths.p50, ths.p10, 7, modName, tol, runtime)
-    run_iMat(core, model_s, gene_expr_s, gene_id_s, expressionCol, figName, epsil, ths.p25, ths.mean, 8, modName, tol, runtime)
-    run_iMat(core, model_s, gene_expr_s, gene_id_s, expressionCol, figName, epsil, ths.p50, ths.mean, 9, modName, tol, runtime)
-    run_iMat(core, model_s, gene_expr_s, gene_id_s, expressionCol, figName, epsil, ths.p50, ths.p25, 10, modName, tol, runtime)
+    expressionCol = mapExpressionToReactions(model_s, expressionData_s);
+        epsil = 1;  
+    run_iMat(core, model_s, expressionCol, figName, epsil, ths.p10, ths.p10, 1, modName, tol, runtime)
+    run_iMat(core, model_s, expressionCol, figName, epsil, ths.mean, ths.mean, 2, modName, tol, runtime)
+    run_iMat(core, model_s, expressionCol, figName, epsil, ths.p25, ths.p25, 3, modName, tol, runtime)
+    run_iMat(core, model_s, expressionCol, figName, epsil, ths.p50, ths.p50, 4, modName, tol, runtime)
+    run_iMat(core, model_s, expressionCol, figName, epsil, ths.mean, ths.p10, 5, modName, tol, runtime)
+    run_iMat(core, model_s, expressionCol, figName, epsil, ths.p25, ths.p10, 6, modName, tol, runtime)
+    run_iMat(core, model_s, expressionCol, figName, epsil, ths.p50, ths.p10, 7, modName, tol, runtime)
+    run_iMat(core, model_s, expressionCol, figName, epsil, ths.p25, ths.mean, 8, modName, tol, runtime)
+    run_iMat(core, model_s, expressionCol, figName, epsil, ths.p50, ths.mean, 9, modName, tol, runtime)
+    run_iMat(core, model_s, expressionCol, figName, epsil, ths.p50, ths.p25, 10, modName, tol, runtime)
 end
 exit;
 end
 
-function run_iMat(core, model, gene_exp, gene_names, expressionCol, figName, epsil, lt, ht, id, modName, tol, runtime)
+function run_iMat(core, model, expressionCol, figName, ~, lb, ub, id, modName, tol, runtime)
     tName = ['iMAT_',figName, num2str(id),'_',modName];
     disp(tName)
-    cMod = call_iMAT(model, core, epsil, expressionCol, lt, ht, tol, [tName,'.txt'], runtime);
+    cMod = iMAT(model, expressionCol, lb, ub, tol, core, [tName,'.txt'], runtime);
+    paramConsistency.epsilon=1e-10;
+    paramConsistency.modeFlag=0;
+    paramConsistency.method='fastcc';
+    
+    [~,fluxConsistentRxnBool] = findFluxConsistentSubset(cMod,paramConsistency);
+    remove=cMod.rxns(fluxConsistentRxnBool==0);
+    cMod = removeRxns(cMod,remove);
+    cMod = removeUnusedGenes(cMod);
     cMod.name = tName;
-    eval([tName,'= addMinGeneField(cMod,gene_exp,gene_names,lt,0);']);
     save([tName,'.mat'],tName)
 end
