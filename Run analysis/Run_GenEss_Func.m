@@ -1,5 +1,5 @@
 
-function [GenEss_score,Func_score] = Run_GenEss_Func(modelName,CellLine)
+function [GenEss_score,Func_score] = Run_GenEss_Func(contextSpecificModelName,CellLine, constrainedModelFile)
 %Run_GenEss_Func Performs analysis for Gene essentiality and Metabolic
 %capabilities
     %linearMOMA
@@ -7,40 +7,50 @@ function [GenEss_score,Func_score] = Run_GenEss_Func(modelName,CellLine)
     % [GenEss_score,Func_score] = Run_GenEss_Func(model,CellLine,savefile)
     %
     %INPUT
-    % modelName        COBRA model structure of the extracted context-specific
-    %                  model
-    % CellLine         Cell Line of the extracted context-specific model
-    %                  (A375, HL60, KBM7 or K562)
+    % contextSpecificModelName  COBRA model structure of the extracted context-specific
+    %                           model
+    % CellLine                  Cell Line of the extracted context-specific model
+    %                           (A375, HL60, KBM7 or K562)
+    % constrainedModelFile      Filename containing the model_u constrained
+    %                           for this cell line
     %
     %OUTPUTS
-    % GenEss_score     Computed Gene Essentiality score
-    % Func_score       Functionality score (pourcentage of capabilities
-    %                  recovered by the context-specific model)
+    % GenEss_score              Computed Gene Essentiality score
+    % Func_score                Functionality score (pourcentage of capabilities
+    %                           recovered by the context-specific model)
 
 
 global  depl_p 
     
-    load(['model_u_',CellLine,'.mat']);
-    load(['gene_expr_u_',CellLine,'.mat']);
-    load(['gene_id_u_',CellLine,'.mat']);
+    if (nargin < 3)
+        load(['model_u_',CellLine,'.mat']);
+        load(['gene_expr_u_',CellLine,'.mat']);
+        load(['gene_id_u_',CellLine,'.mat']);
+    else
+        load(constrainedModelFile, 'model_u');
+    end
     depl_p = findModelDepletionGenes_loc(model_u,['depletion_ratios_',CellLine,'.xls']);
 
 
         %% Load the context-specific model to analyze
-        load([modelName,'.mat']);
-        tmB = eval(modelName);
-        eval(['clear ',modelName]);
+        tmB = readCbModel([contextSpecificModelName,'.mat']);
+%         tmB = load([contextSpecificModelName,'.mat']);
+%         tmB = eval(contextSpecificModelName);
+%         eval(['clear ',contextSpecificModelName]);
   
         %% Check gene-essentiality
         maxgr=0.01;
         tmBcRed = tmB;
-        tmBcRed = changeRxnBounds_loc(tmBcRed,'Biomass_reaction',0,'l');
+        tmBcRed = changeRxnBounds(tmBcRed,tmBcRed.rxns(tmBcRed.c == 1),0,'l');
+        % See if it can use toolbox version
         grRatios = singleGeneDeletion_loc(tmBcRed,'FBA',depl_p.genes);
     
         mEssP = depl_p.values(grRatios <= maxgr);
         mNonP = depl_p.values(grRatios > maxgr);
         
         GenEss_score = ranksum(mEssP,mNonP,'tail','left');
+        % Not really clear what testFunctionality is trying to do. Should
+        % probably read original paper
         [totTest, numTests] = testFunctionality(tmB);
         Func_score=totTest/numTests*100;
         
@@ -261,8 +271,18 @@ end
 function genes_ratios = findModelDepletionGenes_loc(model,filename)
 
     % Load depletion (CRISPR) and ID data
-    [gGeck,gEntr] = textread('gecko_id_to_entrez.txt','%s %s');        
     [~,~,raw] = xlsread(filename);
+    fid = fopen('gecko_id_to_entrez.txt', 'r'); % TODO - THis file was done in XLS, and screwed up several gene names. Can probably be replaced by processing gene_info, or some newer version from the GECKO website.
+    % TODO - there are areathrough genes - can CRISPR/GECKO really disrupt
+    % them and only them? Maybe not important because they're not in the
+    % model?
+    % TODO - use the CERES correction of Gecko, but not at first
+    % https://figshare.com/articles/CERES_-_Meyers_Bryan_et_al_Nature_Genetics_2017_/5319388
+    foo = textscan(fid, '%s %s');
+    fclose(fid);
+    gGeck = foo{1};
+    gEntr = foo{2};
+    clear foo
     gDepl = raw(:,1);
     for i = 1:length(gDepl)
         if isnumeric(gDepl{i})
@@ -272,9 +292,11 @@ function genes_ratios = findModelDepletionGenes_loc(model,filename)
    
     dRatio = raw(:,2);    
     % Only get the genes which can be translated from gecko to entrez
-    [~, entrInds] = ismember(gDepl,gGeck);
-    gEntr = gEntr(entrInds(entrInds~=0));
-    dRatio = cell2mat(dRatio(find(entrInds))); 
+    gEntr2 = gEntr;
+    dRatio2 = dRatio;
+    [~, indEntrez, indDepl] = intersect(gGeck, gDepl);
+    gEntr = gEntr(indEntrez);
+    dRatio = cell2mat(dRatio(indDepl));
     
     % Only get the genes which we have depletion data for and are in the
     % model

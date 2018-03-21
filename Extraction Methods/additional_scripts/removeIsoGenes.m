@@ -5,10 +5,20 @@ function modelNew=removeIsoGenes(model)
     % Output: model where all genes are in the form "enrezID"
     
     model = rmfield(model, {'rules', 'rxnGeneMat'});
+    relevantFields = getModelFieldsForType(model, 'genes');
+    relevantFields = setdiff(relevantFields, 'genes');
+    originalGenes = model.genes;
+    originalGenes = regexprep(originalGenes, '[.]\d*', '');
     model.genes=[];
     model.grRules = regexprep(model.grRules, '[.]\d*', '');
     warning off all
     model = buildRxnGeneMat(model);
     warning on all
     modelNew=model;
+    [~, indToKeep, indNew] = intersect(originalGenes, modelNew.genes);
+    indToRemove = setdiff(1:length(originalGenes), indNew);
+    for currentField=relevantFields'
+        modelNew.(currentField{:})(indNew) = model.(currentField{:})(indToKeep);
+        modelNew.(currentField{:})(indToRemove) = '';
+    end
 end

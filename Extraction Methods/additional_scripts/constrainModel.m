@@ -1,5 +1,5 @@
 function new_model = constrainModel(model, constr,cellType)
-    % Constrains and modifies Recon1 using the exometabolomic data
+    % Constrains and modifies metabolic models using the exometabolomic data
     % Input:
     %   constr - type of constraint that is used on exhcanges: "U", "S" or "C"
     %         U: Unconstrained, only constrain carbon-source metabolites to 
@@ -35,6 +35,15 @@ function new_model = constrainModel(model, constr,cellType)
         new_model = changeRxnBounds(new_model,rxnsOpen,-1000,'l');
     end
     
+    if (isfield(model, 'modelID') && strcmp(model.modelID, 'Recon1.0'))
+        new_model = addReactionsForCorrectBiomass(new_model);
+    end
+    
+    % Set up minimal ATP demand value
+    dm_atp_val = 0.833; %ATP maintenance value [mmol/gDw/h]
+    atpDMInd = full(new_model.S(strcmp(model.mets, 'atp[c]'), :) < 0) & new_model.DMRxnBool';
+    new_model = changeRxnBounds(new_model, new_model.rxns(atpDMInd), dm_atp_val, 'l');
+    
     %Now set exchange reaction rates from measured values
     [exVal,exName,~] = xlsread(['exometabolomics_minmax_',cellType,'.xlsx']);
     essRxns = {'EX_his_L(e)';'EX_ocdca(e)';'EX_ocdcea(e)';'EX_Tyr_ggn(e)';'EX_cys_L(e)'}; %Reactions not in dataset that are allowed uptake
@@ -67,14 +76,15 @@ function new_model = constrainModel(model, constr,cellType)
         end
     end
     
-    %Remove inconsistent reactions
-    %activeRxns = fastcc(new_model, tol);
-    %inactiveRxns = new_model.rxns(setdiff(1:length(new_model.rxns), activeRxns));
-    %new_model = removeRxns(new_model, inactiveRxns);
-    
     %Remove isoforms to make genes unique and also remove genes no longer
     %mapping to any reaction
     new_model = removeIsoGenes(new_model);
+    
+    %Remove inconsistent reactions
+    activeRxns = fastcc(new_model, tol);
+    inactiveRxns = new_model.rxns(setdiff(1:length(new_model.rxns), activeRxns));
+    new_model = removeRxns(new_model, inactiveRxns);
+    new_model = removeUnusedGenes(new_model);
     
     %Check biomass flux
     result = optimizeCbModel(new_model);
@@ -110,4 +120,32 @@ function organicExRxns = find_organic_ex_rxns(model)
         % 'UP_Tyr_ggn[c]']; % This rxn is not in Recon 1 - may be something specific
         % to Recon 2...
     organicExRxns = setdiff(organicExRxns, 'EX_hco3(e)');
+end
+
+function new_model = addReactionsForCorrectBiomass(model)
+
+ %Add biomass and ATP demand reaction (including bounds)
+    [coeff,metName,~] = xlsread('biomass_rxn.xls');
+    new_model = addReaction(model,'Biomass_reaction',metName',coeff',false);
+    new_model = changeObjective(new_model,'Biomass_reaction');
+    dm_atp_val = 0.833; %ATP maintenance value [mmol/gDw/h] % In recon 2.04, this reaction exists but has minimal value of 0
+    new_model = addReaction(new_model,'DM_atp(c)',{'atp[c]','h2o[c]','adp[c]','pi[c]','h[c]'},[-1,-1,1,1,1],false,dm_atp_val,1000,0,'Demand');
+    
+    %Add reactions required to be able to produce biomass
+    new_model = addReaction(new_model,'Tyr-ggnt',{'Tyr-ggn[e]','Tyr-ggn[c]'},[-1,1],false,0 ,1000,0);%required for glygn2 in Biomass
+    new_model = addReaction(new_model,'TYRtm',{'tyr-L[c]','tyr-L[m]'},[-1,1],false,0 ,1000,0); %required for q10 in Biomass
+    new_model = addReaction(new_model,'IPDPxc',{'ipdp[x]','ipdp[c]'},[-1,1],false,0 ,1000,0); %required for q10 in Biomass
+    new_model = addReaction(new_model,'pepslys_sink',{'pepslys[r]'},-1,false,0 ,1000,0); %required to allow carnitine synthesis from lysine
+    new_model = addReaction(new_model,'lystopeplys',{'lys-L[e]','peplys[e]'},[-1,1],false,0 ,1000,0); %allow peplys synthesis from lys   
+    new_model = changeRxnBounds(new_model,{'BILDGLCURt';'BILDGLCURte';'BILGLCURt';'BILGLCURte'},0,'l'); %Was making free ATP in a transport loop
+    bilInds = find(ismember(new_model.rxns,{'BILDGLCURt';'BILDGLCURte';'BILGLCURt';'BILGLCURte'}));
+    new_model.rev(bilInds) = 0; %#ok<FNDSB>
+    %changing ETC rxns to have a unique hydrogen metabolite as complexes are in cristae so hydrogen will diffuse to atp before it leaves the mitochondria 
+    %additionally Mitochondria 2nd Ed pg 183 (Scheffler) has super/supracomplexes of complexes I/III/IV atp synthase dimerization also forms the cristae 
+    warning off all
+    new_model=addReaction(new_model,'temp_rxn','h[im] --> h[c]'); 
+    new_model=changeRxnMets(new_model,'h[c]','h[im]',{'ATPS4m' 'CYOOm3' 'CYOR_u10m' 'Htm' 'NADH2_u10m'}); 
+    new_model=removeRxns(new_model,'temp_rxn');
+    warning on all
+
 end
