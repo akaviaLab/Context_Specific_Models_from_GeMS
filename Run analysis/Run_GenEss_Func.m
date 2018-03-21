@@ -292,8 +292,6 @@ function genes_ratios = findModelDepletionGenes_loc(model,filename)
    
     dRatio = raw(:,2);    
     % Only get the genes which can be translated from gecko to entrez
-    gEntr2 = gEntr;
-    dRatio2 = dRatio;
     [~, indEntrez, indDepl] = intersect(gGeck, gDepl);
     gEntr = gEntr(indEntrez);
     dRatio = cell2mat(dRatio(indDepl));
