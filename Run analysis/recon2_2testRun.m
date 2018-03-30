@@ -39,3 +39,4 @@ for currentFig = [figures]
     end
 end
 %% Depletion ratio
+[GenEss_score,Func_score] = Run_GenEss_Func('FastCore_recon2_2_UB1_A375', 'A375', '/Users/uridavidakavia/Documents/MetaboGenomics/Codes/ModelPerformanceTests/OpdamCellSystems2017/Models and data/A375/recon2_2_A375.mat');

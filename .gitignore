@@ -5,3 +5,7 @@
 
 CobraMILPSolver.log
 MILPProblem.mat
+
+*recon2_2*.mat
+
+extractedModels/*
