@@ -28,31 +28,31 @@ expressionData_s.value(1:length(indNum)) = num(indNum, 2);
         tol = 1e-6;
         figName = [figName,'B'];
         disp('UNCONSTRAINED MODEL')
-        expressionCol = mapExpressionToReactions(model_u, expressionData_u);
-        singleRun(model_u, expressionCol, ths.p10, 0.9, figName, 1, modelName, cellLine, tol)
-        singleRun(model_u, expressionCol, ths.mean, 0.9, figName, 2, modelName, cellLine, tol)
-        singleRun(model_u, expressionCol, ths.p25, 0.9, figName, 3, modelName, cellLine, tol)
-        singleRun(model_u, expressionCol, ths.p50, 0.9, figName, 4, modelName, cellLine, tol)
+        expressionCol_u = mapExpressionToReactions(model_u, expressionData_u);
+        singleRun(model_u, expressionCol_u, ths.p10, 0.9, figName, 1, modelName, cellLine, tol)
+        singleRun(model_u, expressionCol_u, ths.mean, 0.9, figName, 2, modelName, cellLine, tol)
+        singleRun(model_u, expressionCol_u, ths.p25, 0.9, figName, 3, modelName, cellLine, tol)
+        singleRun(model_u, expressionCol_u, ths.p50, 0.9, figName, 4, modelName, cellLine, tol)
     end
     if strcmp(figName,'C')
         tol = 1e-8;
         disp('CONSTRAINED MODEL')
         figName = [figName,'B'];
-        expressionCol = mapExpressionToReactions(model_c, expressionData_c);
-        singleRun(model_c, expressionCol, ths.p10, 0.9, figName, 1, modelName, cellLine, tol)
-        singleRun(model_c, expressionCol, ths.mean, 0.9, figName, 2, modelName, cellLine, tol)
-        singleRun(model_c, expressionCol, ths.p25, 0.9, figName, 3, modelName, cellLine, tol)
-        singleRun(model_c, expressionCol, ths.p50, 0.9, figName, 4, modelName, cellLine, tol)
+        expressionCol_c = mapExpressionToReactions(model_c, expressionData_c);
+        singleRun(model_c, expressionCol_c, ths.p10, 0.9, figName, 1, modelName, cellLine, tol)
+        singleRun(model_c, expressionCol_c, ths.mean, 0.9, figName, 2, modelName, cellLine, tol)
+        singleRun(model_c, expressionCol_c, ths.p25, 0.9, figName, 3, modelName, cellLine, tol)
+        singleRun(model_c, expressionCol_c, ths.p50, 0.9, figName, 4, modelName, cellLine, tol)
     end
     if strcmp(figName,'S')
         tol = 1e-6;
         disp('SEMI-CONSTRAINED MODEL')
         figName = [figName,'B'];
-        expressionCol = mapExpressionToReactions(model_s, expressionData_s);
-        singleRun(model_s, expressionCol, ths.p10, 0.9, figName, 1, modelName, cellLine, tol)
-        singleRun(model_s, expressionCol, ths.mean, 0.9, figName, 2, modelName, cellLine, tol)
-        singleRun(model_s, expressionCol, ths.p25, 0.9, figName, 3, modelName, cellLine, tol)
-        singleRun(model_s, expressionCol, ths.p50, 0.9, figName, 4, modelName, cellLine, tol)
+        expressionCol_s = mapExpressionToReactions(model_s, expressionData_s);
+        singleRun(model_s, expressionCol_s, ths.p10, 0.9, figName, 1, modelName, cellLine, tol)
+        singleRun(model_s, expressionCol_s, ths.mean, 0.9, figName, 2, modelName, cellLine, tol)
+        singleRun(model_s, expressionCol_s, ths.p25, 0.9, figName, 3, modelName, cellLine, tol)
+        singleRun(model_s, expressionCol_s, ths.p50, 0.9, figName, 4, modelName, cellLine, tol)
     end
 end
 
@@ -60,13 +60,11 @@ function singleRun(model, expressionCol, ut, obj_frac, figName, id, modelName, c
     tName = ['GIMME_',modelName, '_', figName, num2str(id),'_',cellLine];
     disp(tName)
     disp('RUNNING GIMME...')
-    options.solver = 'GIMME';
-    options.expressionRxns = expressionCol;
-    options.threshold = ut;
-    options.obj_frac = obj_frac;
-    params.epsilon = tol;
+    optionsLocal = struct('solver', 'GIMME', 'expressionRxns', {expressionCol},...
+        'threshold', ut, 'obj_frac', obj_frac);
+    paramsLocal.epsilon = tol;
     try
-        cMod= createTissueSpecificModel(model, options, 1, [], params);
+        cMod= createTissueSpecificModel(model, optionsLocal, 1, [], paramsLocal);
         cMod.name = tName;
         writeCbModel(cMod, 'mat', tName);
     catch ME

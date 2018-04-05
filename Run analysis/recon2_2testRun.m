@@ -26,7 +26,7 @@ save('/Users/uridavidakavia/Documents/MetaboGenomics/Codes/ModelPerformanceTests
 % [~, genesToDelete] = setdiff(recon2_2.genes, model_s.genes);
 % model_s.geneNames(genesToDelete) = '';
 %% Run FASTCORE 
-load('/Users/uridavidakavia/Documents/MetaboGenomics/Codes/ModelPerformanceTests/OpdamCellSystems2017/Models and data/A375/recon2_2_A375.mat', 'model_u', 'model_c', 'model_s');
+load('/Users/uridavidakavia/Documents/MetaboGenomics/Codes/ModelPerformanceTests/OpdamCellSystems2017/Models and data/A375/recon2_2_A375.mat', 'model_u', 'model_c', 'model_s', 'recon2_2');
 cd(['~' filesep '' filesep 'Documents' filesep 'MetaboGenomics' filesep 'Data' filesep 'ModelPerformanceTests' filesep 'OpdamCellSystems2017' filesep 'RECON2.2'])
 figures = {'U', 'C', 'S'};
 cellLine = 'A375';

@@ -39,8 +39,10 @@ global  depl_p
 %         eval(['clear ',contextSpecificModelName]);
   
         %% Check gene-essentiality
+        % Growth rate for essential genes after KO is at most 0.01 of WT
         maxgr=0.01;
         tmBcRed = tmB;
+        %TODO - think about if lower bound for biomass should be zero
         tmBcRed = changeRxnBounds(tmBcRed,tmBcRed.rxns(tmBcRed.c == 1),0,'l');
         % See if it can use toolbox version
         grRatios = singleGeneDeletion_loc(tmBcRed,'FBA',depl_p.genes);

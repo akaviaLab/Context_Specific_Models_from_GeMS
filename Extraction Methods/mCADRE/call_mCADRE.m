@@ -44,7 +44,8 @@ function tissueModel = call_mCADRE(model, gene_names, gene_exp, GPRmat, GPRrxns,
     % Run mcadre
     [PM, GM, C, NC, Z, model_C, pruneTime, cRes] = mcadre(model, gene_names, expression, confidenceScores, salvageCheck, metaboliteCheck, manualCore, method, GPRrxns, GPRmat, eta, tol);
     tissueModel = PM;
-    tissueModel = removeNonUsedGenes(tissueModel);
+    %   tissueModel = removeNonUsedGenes(tissueModel);
+    tissueModel = removeUnusedGenes(tissueModel);
     
     is_active = fastcc(tissueModel, tol);
     inactiveRxns = setdiff(tissueModel.rxns, tissueModel.rxns(is_active));
@@ -153,7 +154,7 @@ function [PM, GM, C, NC, Z, model_C, pruneTime, cRes] = mcadre(model, G, U, conf
         end
 end
 
-function [GM, C, NC, P, Z, model_C] = rank_reactions(model, G, U, confidenceScores, manualCore, method, GPRrxns, GPRmat)
+function [GM, C, NC, P, Z, model_C] = rank_reactions(model, G, U, confidenceScores, manualCore, method, ~, ~)
     % Inputs:
     % - model
     % - gene IDs from expression data
@@ -169,13 +170,11 @@ function [GM, C, NC, P, Z, model_C] = rank_reactions(model, G, U, confidenceScor
     if nargin < 6
         method = 1; % fastFVA
     end
-
+    
     % Parse GPRs
-    if nargin < 7
-        %disp('No GPRs as input, calculate GPRs')
-        [GPRrxns, GPRmat] = parse_gprs(model);
-    end
-
+    %disp('No GPRs as input, calculate GPRs')
+    [GPRrxns, GPRmat] = parse_gprs(model);
+    
     % Map high confidence genes to reactions
     % FIX: Modified to work with core reactions instead of core genes
     if nargin > 4

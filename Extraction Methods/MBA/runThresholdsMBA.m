@@ -31,25 +31,26 @@ if strcmp(figName,'U')
     if strcmp(bb, 'B')
         biomassRxnInd = strcmpi(model_u.rxns, 'biomass_reaction');
         biomassRxn = model_u.rxns(biomassRxnInd);
+        atpDM = model_u.rxns(strncmp(model_u.rxns, 'DM_atp', 6) || strcmp(model_u.rxns, 'ATPM'));
         model_u = changeRxnBounds(model_u, biomassRxn, blb, 'l'); %Force biomass and ATP demand to be active
-        core = {biomassRxn,'DM_atp(c)'};
+        core = {biomassRxn,atpDM};
         figName = [figName,'B'];
     end
     if strcmp(bb, 'F')
         model_u = addBiomassSinks(model_u);
         figName = [figName,'F'];
     end
-    expressionCol = mapExpressionToReactions(model_u, expressionData_u);
-    run_MBA(core, model_u, expressionCol, figName, ths.p10, ths.p10, 1, modelName, tol)
-    run_MBA(core, model_u, expressionCol, figName, ths.mean, ths.mean, 2, modelName, tol)
-    run_MBA(core, model_u, expressionCol, figName, ths.p25, ths.p25, 3, modelName, tol)
-    run_MBA(core, model_u, expressionCol, figName, ths.p50, ths.p50, 4, modelName, tol)
-    run_MBA(core, model_u, expressionCol, figName, ths.mean, ths.p10, 5, modelName, tol)
-    run_MBA(core, model_u, expressionCol, figName, ths.p25, ths.p10, 6, modelName, tol)
-    run_MBA(core, model_u, expressionCol, figName, ths.p50, ths.p10, 7, modelName, tol)
-    run_MBA(core, model_u, expressionCol, figName, ths.p25, ths.mean, 8, modelName, tol)
-    run_MBA(core, model_u, expressionCol, figName, ths.p50, ths.mean, 9, modelName, tol)
-    run_MBA(core, model_u, expressionCol, figName, ths.p50, ths.p25, 10, modelName, tol)
+    expressionCol_u = mapExpressionToReactions(model_u, expressionData_u);
+    run_MBA(core, model_u, expressionCol_u, figName, ths.p10, ths.p10, 1, modelName, tol)
+    run_MBA(core, model_u, expressionCol_u, figName, ths.mean, ths.mean, 2, modelName, tol)
+    run_MBA(core, model_u, expressionCol_u, figName, ths.p25, ths.p25, 3, modelName, tol)
+    run_MBA(core, model_u, expressionCol_u, figName, ths.p50, ths.p50, 4, modelName, tol)
+    run_MBA(core, model_u, expressionCol_u, figName, ths.mean, ths.p10, 5, modelName, tol)
+    run_MBA(core, model_u, expressionCol_u, figName, ths.p25, ths.p10, 6, modelName, tol)
+    run_MBA(core, model_u, expressionCol_u, figName, ths.p50, ths.p10, 7, modelName, tol)
+    run_MBA(core, model_u, expressionCol_u, figName, ths.p25, ths.mean, 8, modelName, tol)
+    run_MBA(core, model_u, expressionCol_u, figName, ths.p50, ths.mean, 9, modelName, tol)
+    run_MBA(core, model_u, expressionCol_u, figName, ths.p50, ths.p25, 10, modelName, tol)
 end
 
 if strcmp(figName,'C')
@@ -59,8 +60,9 @@ if strcmp(figName,'C')
     if strcmp(bb, 'B')
         biomassRxnInd = strcmpi(model_c.rxns, 'biomass_reaction');
         biomassRxn = model_c.rxns(biomassRxnInd);
+        atpDM = model_c.rxns(strncmp(model_c.rxns, 'DM_atp', 6) || strcmp(model_c.rxns, 'ATPM'));
         model_c = changeRxnBounds(model_c, biomassRxn, blb, 'l'); %Force biomass and ATP demand to be active
-        core = {biomassRxn,'DM_atp(c)'};
+        core = {biomassRxn,atpDM};
         figName = [figName,'B'];
     end
     if strcmp(bb, 'F')
@@ -70,21 +72,22 @@ if strcmp(figName,'C')
     if strcmp(bb, 'H')
         biomassRxnInd = strcmpi(model_c.rxns, 'biomass_reaction');
         biomassRxn = model_c.rxns(biomassRxnInd);
+        atpDM = model_c.rxns(strncmp(model_c.rxns, 'DM_atp', 6) || strcmp(model_c.rxns, 'ATPM'));
         model_c = changeRxnBounds(model_c, biomassRxn, 1e-3, 'l'); %Force biomass and ATP demand to be active
-        core = {biomassRxn,'DM_atp(c)'};
+        core = {biomassRxn,atpDM};
         figName = [figName,'H'];
     end
-    expressionCol = mapExpressionToReactions(model_c, expressionData_c);
-    run_MBA(core, model_c, expressionCol, figName, ths.p10, ths.p10, 1, modelName, tol)
-    run_MBA(core, model_c, expressionCol, figName, ths.mean, ths.mean, 2, modelName, tol)
-    run_MBA(core, model_c, expressionCol, figName, ths.p25, ths.p25, 3, modelName, tol)
-    run_MBA(core, model_c, expressionCol, figName, ths.p50, ths.p50, 4, modelName, tol)
-    run_MBA(core, model_c, expressionCol, figName, ths.mean, ths.p10, 5, modelName, tol)
-    run_MBA(core, model_c, expressionCol, figName, ths.p25, ths.p10, 6, modelName, tol)
-    run_MBA(core, model_c, expressionCol, figName, ths.p50, ths.p10, 7, modelName, tol)
-    run_MBA(core, model_c, expressionCol, figName, ths.p25, ths.mean, 8, modelName, tol)
-    run_MBA(core, model_c, expressionCol, figName, ths.p50, ths.mean, 9, modelName, tol)
-    run_MBA(core, model_c, expressionCol, figName, ths.p50, ths.p25, 10, modelName, tol)
+    expressionCol_c = mapExpressionToReactions(model_c, expressionData_c);
+    run_MBA(core, model_c, expressionCol_c, figName, ths.p10, ths.p10, 1, modelName, tol)
+    run_MBA(core, model_c, expressionCol_c, figName, ths.mean, ths.mean, 2, modelName, tol)
+    run_MBA(core, model_c, expressionCol_c, figName, ths.p25, ths.p25, 3, modelName, tol)
+    run_MBA(core, model_c, expressionCol_c, figName, ths.p50, ths.p50, 4, modelName, tol)
+    run_MBA(core, model_c, expressionCol_c, figName, ths.mean, ths.p10, 5, modelName, tol)
+    run_MBA(core, model_c, expressionCol_c, figName, ths.p25, ths.p10, 6, modelName, tol)
+    run_MBA(core, model_c, expressionCol_c, figName, ths.p50, ths.p10, 7, modelName, tol)
+    run_MBA(core, model_c, expressionCol_c, figName, ths.p25, ths.mean, 8, modelName, tol)
+    run_MBA(core, model_c, expressionCol_c, figName, ths.p50, ths.mean, 9, modelName, tol)
+    run_MBA(core, model_c, expressionCol_c, figName, ths.p50, ths.p25, 10, modelName, tol)
 end
 if strcmp(figName,'S')
     %SEMI-CONSTRAINED
@@ -93,25 +96,26 @@ if strcmp(figName,'S')
     if strcmp(bb, 'B')
         biomassRxnInd = strcmpi(model_s.rxns, 'biomass_reaction');
         biomassRxn = model_s.rxns(biomassRxnInd);
+        atpDM = model_s.rxns(strncmp(model_s.rxns, 'DM_atp', 6) || strcmp(model_s.rxns, 'ATPM'));
         model_s = changeRxnBounds(model_s, biomassRxn, blb, 'l'); %Force biomass and ATP demand to be active
-        core = {biomassRxn,'DM_atp(c)'};
+        core = {biomassRxn,atpDM};
         figName = [figName,'B'];
     end
     if strcmp(bb, 'F')
         model_s = addBiomassSinks(model_s);
         figName = [figName,'F'];
     end
-    expressionCol = mapExpressionToReactions(model_s, expressionData_s);
-    run_MBA(core, model_s, expressionCol, figName, ths.p10, ths.p10, 1, modelName, tol)
-    run_MBA(core, model_s, expressionCol, figName, ths.mean, ths.mean, 2, modelName, tol)
-    run_MBA(core, model_s, expressionCol, figName, ths.p25, ths.p25, 3, modelName, tol)
-    run_MBA(core, model_s, expressionCol, figName, ths.p50, ths.p50, 4, modelName, tol)
-    run_MBA(core, model_s, expressionCol, figName, ths.mean, ths.p10, 5, modelName, tol)
-    run_MBA(core, model_s, expressionCol, figName, ths.p25, ths.p10, 6, modelName, tol)
-    run_MBA(core, model_s, expressionCol, figName, ths.p50, ths.p10, 7, modelName, tol)
-    run_MBA(core, model_s, expressionCol, figName, ths.p25, ths.mean, 8, modelName, tol)
-    run_MBA(core, model_s, expressionCol, figName, ths.p50, ths.mean, 9, modelName, tol)
-    run_MBA(core, model_s, expressionCol, figName, ths.p50, ths.p25, 10, modelName, tol)
+    expressionCol_s = mapExpressionToReactions(model_s, expressionData_s);
+    run_MBA(core, model_s, expressionCol_s, figName, ths.p10, ths.p10, 1, modelName, tol)
+    run_MBA(core, model_s, expressionCol_s, figName, ths.mean, ths.mean, 2, modelName, tol)
+    run_MBA(core, model_s, expressionCol_s, figName, ths.p25, ths.p25, 3, modelName, tol)
+    run_MBA(core, model_s, expressionCol_s, figName, ths.p50, ths.p50, 4, modelName, tol)
+    run_MBA(core, model_s, expressionCol_s, figName, ths.mean, ths.p10, 5, modelName, tol)
+    run_MBA(core, model_s, expressionCol_s, figName, ths.p25, ths.p10, 6, modelName, tol)
+    run_MBA(core, model_s, expressionCol_s, figName, ths.p50, ths.p10, 7, modelName, tol)
+    run_MBA(core, model_s, expressionCol_s, figName, ths.p25, ths.mean, 8, modelName, tol)
+    run_MBA(core, model_s, expressionCol_s, figName, ths.p50, ths.mean, 9, modelName, tol)
+    run_MBA(core, model_s, expressionCol_s, figName, ths.p50, ths.p25, 10, modelName, tol)
 end
 exit;
 end

@@ -33,8 +33,9 @@ if strcmp(figName,'U')
     if strcmp(bb,'B')
         biomassRxnInd = strcmpi(model_u.rxns, 'biomass_reaction');
         biomassRxn = model_u.rxns(biomassRxnInd);
+        atpDM = model_u.rxns(strncmp(model_u.rxns, 'DM_atp', 6) || strcmp(model_u.rxns, 'ATPM'));
         model_u = changeRxnBounds(model_u, biomassRxn, blb, 'l'); %Force biomass and ATP demand to be active
-        core = {biomassRxn,'DM_atp(c)'};
+        core = {biomassRxn,atpDM};
         figName = [figName,'B'];
     end
     if strcmp(bb,'F')
@@ -63,8 +64,9 @@ if strcmp(figName,'C')
     if strcmp(bb,'B')
         biomassRxnInd = strcmpi(model_c.rxns, 'biomass_reaction');
         biomassRxn = model_c.rxns(biomassRxnInd);
+        atpDM = model_c.rxns(strncmp(model_c.rxns, 'DM_atp', 6) || strcmp(model_c.rxns, 'ATPM'));
         model_c = changeRxnBounds(model_c, biomassRxn, blb, 'l'); %Force biomass and ATP demand to be active
-        core = {biomassRxn,'DM_atp(c)'};
+        core = {biomassRxn,atpDM};
         figName = [figName,'B'];
     end
     if strcmp(bb,'F')
@@ -74,8 +76,9 @@ if strcmp(figName,'C')
     if strcmp(bb,'H')
         biomassRxnInd = strcmpi(model_c.rxns, 'biomass_reaction');
         biomassRxn = model_c.rxns(biomassRxnInd);
-        model_c = changeRxnBounds(model_c, biomassRxn, blb, 'l'); %Force biomass and ATP demand to be active
-        core = {biomassRxn,'DM_atp(c)'};
+        atpDM = model_c.rxns(strncmp(model_c.rxns, 'DM_atp', 6) || strcmp(model_c.rxns, 'ATPM'));
+        model_c = changeRxnBounds(model_c, biomassRxn, 1e-3, 'l'); %Force biomass and ATP demand to be active
+        core = {biomassRxn,atpDM};
         figName = [figName,'H'];
     end
     expressionCol = mapExpressionToReactions(model_c, expressionData_c);
@@ -100,8 +103,9 @@ if strcmp(figName,'S')
     if strcmp(bb,'B')
         biomassRxnInd = strcmpi(model_s.rxns, 'biomass_reaction');
         biomassRxn = model_s.rxns(biomassRxnInd);
+        atpDM = model_s.rxns(strncmp(model_s.rxns, 'DM_atp', 6) || strcmp(model_s.rxns, 'ATPM'));
         model_s = changeRxnBounds(model_s, biomassRxn, blb, 'l'); %Force biomass and ATP demand to be active
-        core = {biomassRxn,'DM_atp(c)'};
+        core = {biomassRxn,atpDM};
         figName = [figName,'B'];
     end
     if strcmp(bb,'F')
@@ -127,9 +131,8 @@ end
 function run_iMat(core, model, expressionCol, figName, ~, lb, ub, id, modName, tol, runtime)
     tName = ['iMAT_',figName, num2str(id),'_',modName];
     disp(tName)
-    optionsLocal = struct('solver', 'iMAT', 'expressionRxns', expressionCol, 'threshold_lb', lb, ...
-                          'threshold_ub', ub, 'tol', tol, 'core', core, 'logFile', [tName,'.txt'], 'runtime', runtime);
-   
+    optionsLocal = struct('solver', 'iMAT', 'expressionRxns', {expressionCol}, 'threshold_lb', lb, ...
+                          'threshold_ub', ub, 'tol', tol, 'core', {core}, 'logFile', [tName,'.txt'], 'runtime', runtime);
     try
         cMod = createTissueSpecificModel(model, optionsLocal, 1);
         cMod.name = tName;

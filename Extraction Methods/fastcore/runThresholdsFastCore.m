@@ -1,10 +1,5 @@
 function runThresholdsFastCore(figName, bb, modelName, cellLine)
 %initCobraToolbox
-% This loads up the gene expression based on the FPKM file, so it has
-% the option of dealing with more reactions. There are three genes
-% (2878, 4259, 5337)
-% and four reactions (GTHPe, LTC4Sr, PCHOLPm_hs, PCHOLPr_hs) that are
-% different based on the FPKM file to the existing gene_expr/gene_id structure.
 load(['ID_FPKM_', cellLine, '.mat'], 'num');
 load(['growthRate_',cellLine,'.mat'], 'blb')
 load(['gene_threshold_',cellLine,'.mat'], 'ths')
@@ -34,9 +29,9 @@ if strcmp(figName,'U')
     core = {};
     if strcmp(bb,'B')
         biomassRxnInd = strcmpi(model_u.rxns, 'biomass_reaction');
-        biomassRxn = model_u.rxns(biomassRxnInd);
-        model_u = changeRxnBounds(model_u, biomassRxn, blb, 'l'); %Force biomass and ATP demand to be active
-        core = {biomassRxn,'DM_atp(c)'};
+        atpDMInd = strncmp(model_u.rxns, 'DM_atp', 6) || strcmp(model_u.rxns, 'ATPM');
+        model_u = changeRxnBounds(model_u, model_u.rxns(biomassRxnInd), blb, 'l'); %Force biomass and ATP demand to be active
+        core = [biomassRxnInd,atpDMInd];
         figName = [figName,'B'];
     end
     if strcmp(bb,'F')
@@ -57,9 +52,9 @@ if strcmp(figName,'C')
     core = {};
     if strcmp(bb,'B')
         biomassRxnInd = strcmpi(model_c.rxns, 'biomass_reaction');
-        biomassRxn = model_c.rxns(biomassRxnInd);
-        model_c = changeRxnBounds(model_c, biomassRxn, blb, 'l'); %Force biomass and ATP demand to be active
-        core = {biomassRxn,'DM_atp(c)'};
+        atpDMInd = strncmp(model_c.rxns, 'DM_atp', 6) || strcmp(model_c.rxns, 'ATPM');
+        model_c = changeRxnBounds(model_c, model_c.rxns(biomassRxnInd), blb, 'l'); %Force biomass and ATP demand to be active
+        core = [biomassRxnInd,atpDMInd];
         figName = [figName,'B'];
     end
     if strcmp(bb,'F')
@@ -68,9 +63,9 @@ if strcmp(figName,'C')
     end
     if strcmp(bb,'H')
         biomassRxnInd = strcmpi(model_c.rxns, 'biomass_reaction');
-        biomassRxn = model_c.rxns(biomassRxnInd);
-        model_c = changeRxnBounds(model_c, biomassRxn, 1e-3, 'l'); %Force biomass and ATP demand to be active
-        core = {biomassRxn,'DM_atp(c)'};
+        atpDMInd = strncmp(model_c.rxns, 'DM_atp', 6) || strcmp(model_c.rxns, 'ATPM');
+        model_c = changeRxnBounds(model_c, model_c.rxns(biomassRxnInd), 1e-3, 'l'); %Force biomass and ATP demand to be active
+        core = [biomassRxnInd,atpDMInd];
         figName = [figName,'H'];
     end
     epsil = 1e-8;
@@ -87,9 +82,9 @@ if strcmp(figName,'S')
     core = {};
     if strcmp(bb,'B')
         biomassRxnInd = strcmpi(model_s.rxns, 'biomass_reaction');
-        biomassRxn = model_s.rxns(biomassRxnInd);
-        model_s = changeRxnBounds(model_s, biomassRxn, blb, 'l'); %Force biomass and ATP demand to be active
-        core = {biomassRxn,'DM_atp(c)'};
+        atpDMInd = strncmp(model_s.rxns, 'DM_atp', 6) || strcmp(model_s.rxns, 'ATPM');
+        model_s = changeRxnBounds(model_s, model_s.rxns(biomassRxnInd), blb, 'l'); %Force biomass and ATP demand to be active
+        core = [biomassRxnInd,atpDMInd];
         figName = [figName,'B'];
     end
     if strcmp(bb,'F')
@@ -110,7 +105,7 @@ function singleRun(core, expressionCol, figName, model, epsil, th, id, modelName
 tName = ['FastCore_',modelName, '_', figName, num2str(id),'_',cellLine];
 disp(tName)
 C = find(expressionCol >= th);
-C = union(C, find(ismember(model.rxns, core)));
+C = union(C, core);
 try
     cMod = fastcore(model, C, epsil);
     cMod.name = tName;
