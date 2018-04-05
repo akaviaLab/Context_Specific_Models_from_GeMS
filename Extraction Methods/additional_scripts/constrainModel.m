@@ -41,7 +41,7 @@ function new_model = constrainModel(model, constr,cellType)
     
     % Set up minimal ATP demand value
     dm_atp_val = 0.833; %ATP maintenance value [mmol/gDw/h]
-    atpDMInd = strncmp(model.rxns, 'DM_atp', 6) || strcmp(model.rxns, 'ATPM');
+    atpDMInd = strncmp(model.rxns, 'DM_atp', 6) | strcmp(model.rxns, 'ATPM');
     new_model = changeRxnBounds(new_model, new_model.rxns(atpDMInd), dm_atp_val, 'l');
     
     %Now set exchange reaction rates from measured values
