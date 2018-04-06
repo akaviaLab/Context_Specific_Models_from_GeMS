@@ -33,7 +33,7 @@ if strcmp(figName,'U')
     if strcmp(bb,'B')
         biomassRxnInd = strcmpi(model_u.rxns, 'biomass_reaction');
         biomassRxn = model_u.rxns(biomassRxnInd);
-        atpDM = model_u.rxns(strncmp(model_u.rxns, 'DM_atp', 6) || strcmp(model_u.rxns, 'ATPM'));
+        atpDM = model_u.rxns(strncmp(model_u.rxns, 'DM_atp', 6) | strcmp(model_u.rxns, 'ATPM'));
         model_u = changeRxnBounds(model_u, biomassRxn, blb, 'l'); %Force biomass and ATP demand to be active
         core = {biomassRxn,atpDM};
         figName = [figName,'B'];
@@ -64,7 +64,7 @@ if strcmp(figName,'C')
     if strcmp(bb,'B')
         biomassRxnInd = strcmpi(model_c.rxns, 'biomass_reaction');
         biomassRxn = model_c.rxns(biomassRxnInd);
-        atpDM = model_c.rxns(strncmp(model_c.rxns, 'DM_atp', 6) || strcmp(model_c.rxns, 'ATPM'));
+        atpDM = model_c.rxns(strncmp(model_c.rxns, 'DM_atp', 6) | strcmp(model_c.rxns, 'ATPM'));
         model_c = changeRxnBounds(model_c, biomassRxn, blb, 'l'); %Force biomass and ATP demand to be active
         core = {biomassRxn,atpDM};
         figName = [figName,'B'];
@@ -76,7 +76,7 @@ if strcmp(figName,'C')
     if strcmp(bb,'H')
         biomassRxnInd = strcmpi(model_c.rxns, 'biomass_reaction');
         biomassRxn = model_c.rxns(biomassRxnInd);
-        atpDM = model_c.rxns(strncmp(model_c.rxns, 'DM_atp', 6) || strcmp(model_c.rxns, 'ATPM'));
+        atpDM = model_c.rxns(strncmp(model_c.rxns, 'DM_atp', 6) | strcmp(model_c.rxns, 'ATPM'));
         model_c = changeRxnBounds(model_c, biomassRxn, 1e-3, 'l'); %Force biomass and ATP demand to be active
         core = {biomassRxn,atpDM};
         figName = [figName,'H'];
@@ -103,7 +103,7 @@ if strcmp(figName,'S')
     if strcmp(bb,'B')
         biomassRxnInd = strcmpi(model_s.rxns, 'biomass_reaction');
         biomassRxn = model_s.rxns(biomassRxnInd);
-        atpDM = model_s.rxns(strncmp(model_s.rxns, 'DM_atp', 6) || strcmp(model_s.rxns, 'ATPM'));
+        atpDM = model_s.rxns(strncmp(model_s.rxns, 'DM_atp', 6) | strcmp(model_s.rxns, 'ATPM'));
         model_s = changeRxnBounds(model_s, biomassRxn, blb, 'l'); %Force biomass and ATP demand to be active
         core = {biomassRxn,atpDM};
         figName = [figName,'B'];

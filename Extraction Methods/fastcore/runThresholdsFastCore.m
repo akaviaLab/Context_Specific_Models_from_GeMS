@@ -29,7 +29,7 @@ if strcmp(figName,'U')
     core = {};
     if strcmp(bb,'B')
         biomassRxnInd = strcmpi(model_u.rxns, 'biomass_reaction');
-        atpDMInd = strncmp(model_u.rxns, 'DM_atp', 6) || strcmp(model_u.rxns, 'ATPM');
+        atpDMInd = strncmp(model_u.rxns, 'DM_atp', 6) | strcmp(model_u.rxns, 'ATPM');
         model_u = changeRxnBounds(model_u, model_u.rxns(biomassRxnInd), blb, 'l'); %Force biomass and ATP demand to be active
         core = [biomassRxnInd,atpDMInd];
         figName = [figName,'B'];
@@ -52,7 +52,7 @@ if strcmp(figName,'C')
     core = {};
     if strcmp(bb,'B')
         biomassRxnInd = strcmpi(model_c.rxns, 'biomass_reaction');
-        atpDMInd = strncmp(model_c.rxns, 'DM_atp', 6) || strcmp(model_c.rxns, 'ATPM');
+        atpDMInd = strncmp(model_c.rxns, 'DM_atp', 6) | strcmp(model_c.rxns, 'ATPM');
         model_c = changeRxnBounds(model_c, model_c.rxns(biomassRxnInd), blb, 'l'); %Force biomass and ATP demand to be active
         core = [biomassRxnInd,atpDMInd];
         figName = [figName,'B'];
@@ -63,7 +63,7 @@ if strcmp(figName,'C')
     end
     if strcmp(bb,'H')
         biomassRxnInd = strcmpi(model_c.rxns, 'biomass_reaction');
-        atpDMInd = strncmp(model_c.rxns, 'DM_atp', 6) || strcmp(model_c.rxns, 'ATPM');
+        atpDMInd = strncmp(model_c.rxns, 'DM_atp', 6) | strcmp(model_c.rxns, 'ATPM');
         model_c = changeRxnBounds(model_c, model_c.rxns(biomassRxnInd), 1e-3, 'l'); %Force biomass and ATP demand to be active
         core = [biomassRxnInd,atpDMInd];
         figName = [figName,'H'];
@@ -82,7 +82,7 @@ if strcmp(figName,'S')
     core = {};
     if strcmp(bb,'B')
         biomassRxnInd = strcmpi(model_s.rxns, 'biomass_reaction');
-        atpDMInd = strncmp(model_s.rxns, 'DM_atp', 6) || strcmp(model_s.rxns, 'ATPM');
+        atpDMInd = strncmp(model_s.rxns, 'DM_atp', 6) | strcmp(model_s.rxns, 'ATPM');
         model_s = changeRxnBounds(model_s, model_s.rxns(biomassRxnInd), blb, 'l'); %Force biomass and ATP demand to be active
         core = [biomassRxnInd,atpDMInd];
         figName = [figName,'B'];
