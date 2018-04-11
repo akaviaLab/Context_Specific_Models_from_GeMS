@@ -136,7 +136,7 @@ function run_MBA(core, model, expressionCol, figName, mt, ut, id, modName, tol, 
         CM = model.rxns(indM); %#ok<FNDSB>
         try
             cMod = MBA(model, CM, CH, tol);
-        catch
+        catch ME
             warning('Failed to run MBA on model %s, figure %s with cell line %s', modelName, [figName num2str(id)], cellLine);
             warning(ME.message)
         end

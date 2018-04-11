@@ -154,7 +154,7 @@ function singleRun(core, model, gene_names, gene_exp, parsedGPR, corrRxn, ht, mc
         cMod2 = createTissueSpecificModel(model, optionsLocal); % consistency check not required, because mCADRE seems to run it on its own
         cMod2.name = tName;
         writeCbModel(cMod2, 'mat', [tName '2']);
-    catch
+    catch ME
         warning('Failed to run mCADRE on model %s, figure %s with cell line %s', modelName, [figName num2str(id)], cellLine);
         warning(ME.message)
     end
