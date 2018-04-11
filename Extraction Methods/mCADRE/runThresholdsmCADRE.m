@@ -32,7 +32,7 @@ expressionData_s.value(1:length(indNum)) = num(indNum, 2);
             biomassRxn = model_u.rxns(biomassRxnInd);
             atpDM = model_u.rxns(strncmp(model_u.rxns, 'DM_atp', 6) | strcmp(model_u.rxns, 'ATPM'));
             model_u = changeRxnBounds(model_u, biomassRxn, blb, 'l'); %Force biomass and ATP demand to be active
-            core = {biomassRxn,atpDM};
+            core = [biomassRxn, atpDM];
             figName = [figName,'B'];
         end
         if strcmp(bb,'F')
@@ -43,10 +43,10 @@ expressionData_s.value(1:length(indNum)) = num(indNum, 2);
         end
         disp('UNCONSTRAINED MODEL')
         expressionCol_u = mapExpressionToReactions(model_u, expressionData_u);
-        singleRun(core, model_u, expressionData_u.gene, expressionData_u.value, [], [], ths.p10, 1, 1/3, figName, 1, modelName, tol, expressionCol_u)
-        singleRun(core, model_u, expressionData_u.gene, expressionData_u.value, [], [], ths.mean, 1, 1/3, figName, 2, modelName, tol, expressionCol_u)
-        singleRun(core, model_u, expressionData_u.gene, expressionData_u.value, [], [], ths.p25, 1, 1/3, figName, 3, modelName, tol, expressionCol_u)
-        singleRun(core, model_u, expressionData_u.gene, expressionData_u.value, [], [], ths.p50, 1, 1/3, figName, 4, modelName, tol, expressionCol_u)
+        singleRun(core, model_u, expressionData_u.gene, expressionData_u.value, [], [], ths.p10, 1, 1/3, figName, 1, modelName, tol, expressionCol_u, cellLine)
+        singleRun(core, model_u, expressionData_u.gene, expressionData_u.value, [], [], ths.mean, 1, 1/3, figName, 2, modelName, tol, expressionCol_u, cellLine)
+        singleRun(core, model_u, expressionData_u.gene, expressionData_u.value, [], [], ths.p25, 1, 1/3, figName, 3, modelName, tol, expressionCol_u, cellLine)
+        singleRun(core, model_u, expressionData_u.gene, expressionData_u.value, [], [], ths.p50, 1, 1/3, figName, 4, modelName, tol, expressionCol_u, cellLine)
     end
     if strcmp(figName,'C')
         tol = 1e-8;
@@ -57,7 +57,7 @@ expressionData_s.value(1:length(indNum)) = num(indNum, 2);
             biomassRxn = model_c.rxns(biomassRxnInd);
             atpDM = model_c.rxns(strncmp(model_c.rxns, 'DM_atp', 6) | strcmp(model_c.rxns, 'ATPM'));
             model_c = changeRxnBounds(model_c, biomassRxn, blb, 'l'); %Force biomass and ATP demand to be active
-            core = {biomassRxn,atpDM};
+            core = [biomassRxn, atpDM];
             figName = [figName,'B'];
         end
         if strcmp(bb,'F')
@@ -71,14 +71,14 @@ expressionData_s.value(1:length(indNum)) = num(indNum, 2);
             biomassRxn = model_c.rxns{biomassRxnInd};
             atpDM = model_c.rxns(strncmp(model_c.rxns, 'DM_atp', 6) | strcmp(model_c.rxns, 'ATPM'));
             model_c = changeRxnBounds(model_c, biomassRxn, 1e-3, 'l'); %Force biomass and ATP demand to be active
-            core = {biomassRxn,atpDM};            
+            core = [biomassRxn, atpDM];            
             figName = [figName,'H'];
         end
         expressionCol_c = mapExpressionToReactions(model_c, expressionData_c);
-        singleRun(core, model_c, expressionData_c.gene, expressionData_c.value, [], [], ths.p10, 1, 1/3, figName, 1, modelName, tol, expressionCol_c)
-        singleRun(core, model_c, expressionData_c.gene, expressionData_c.value, [], [], ths.mean, 1, 1/3, figName, 2, modelName, tol, expressionCol_c)
-        singleRun(core, model_c, expressionData_c.gene, expressionData_c.value, [], [], ths.p25, 1, 1/3, figName, 3, modelName, tol, expressionCol_c)
-        singleRun(core, model_c, expressionData_c.gene, expressionData_c.value, [], [], ths.p50, 1, 1/2, figName, 4, modelName, tol, expressionCol_c)
+        singleRun(core, model_c, expressionData_c.gene, expressionData_c.value, [], [], ths.p10, 1, 1/3, figName, 1, modelName, tol, expressionCol_c, cellLine)
+        singleRun(core, model_c, expressionData_c.gene, expressionData_c.value, [], [], ths.mean, 1, 1/3, figName, 2, modelName, tol, expressionCol_c, cellLine)
+        singleRun(core, model_c, expressionData_c.gene, expressionData_c.value, [], [], ths.p25, 1, 1/3, figName, 3, modelName, tol, expressionCol_c, cellLine)
+        singleRun(core, model_c, expressionData_c.gene, expressionData_c.value, [], [], ths.p50, 1, 1/2, figName, 4, modelName, tol, expressionCol_c, cellLine)
     end
     if strcmp(figName,'S')
         tol = 1e-6;
@@ -88,7 +88,7 @@ expressionData_s.value(1:length(indNum)) = num(indNum, 2);
             biomassRxn = model_s.rxns(biomassRxnInd);
             atpDM = model_s.rxns(strncmp(model_s.rxns, 'DM_atp', 6) || strcmp(model_s.rxns, 'ATPM'));
             model_s = changeRxnBounds(model_s, biomassRxn, blb, 'l'); %Force biomass and ATP demand to be active
-            core = {biomassRxn,atpDM};
+            core = [biomassRxn, atpDM];
             figName = [figName,'B'];
         end
         if strcmp(bb,'F')
@@ -99,15 +99,15 @@ expressionData_s.value(1:length(indNum)) = num(indNum, 2);
         end
         disp('SEMI-CONSTRAINED MODEL')
         expressionCol_s = mapExpressionToReactions(model_s, expressionData_s);
-        singleRun(core, model_s, expressionData_s.gene, expressionData_s.value, [], [], ths.p10, 1, 1/3, figName, 1, modelName, tol, expressionCol_s)
-        singleRun(core, model_s, expressionData_s.gene, expressionData_s.value, [], [], ths.mean, 1, 1/3, figName, 2, modelName, tol, expressionCol_s)
-        singleRun(core, model_s, expressionData_s.gene, expressionData_s.value, [], [], ths.p25, 1, 1/3, figName, 3, modelName, tol, expressionCol_s)
-        singleRun(core, model_s, expressionData_s.gene, expressionData_s.value, [], [], ths.p50, 1, 1/3, figName, 4, modelName, tol, expressionCol_s)
+        singleRun(core, model_s, expressionData_s.gene, expressionData_s.value, [], [], ths.p10, 1, 1/3, figName, 1, modelName, tol, expressionCol_s, cellLine)
+        singleRun(core, model_s, expressionData_s.gene, expressionData_s.value, [], [], ths.mean, 1, 1/3, figName, 2, modelName, tol, expressionCol_s, cellLine)
+        singleRun(core, model_s, expressionData_s.gene, expressionData_s.value, [], [], ths.p25, 1, 1/3, figName, 3, modelName, tol, expressionCol_s, cellLine)
+        singleRun(core, model_s, expressionData_s.gene, expressionData_s.value, [], [], ths.p50, 1, 1/3, figName, 4, modelName, tol, expressionCol_s, cellLine)
     end
     exit;
 end
 
-function singleRun(core, model, gene_names, gene_exp, parsedGPR, corrRxn, ht, mcheck, eta, figName, id, modelName, tol, expressionCol)
+function singleRun(core, model, gene_names, gene_exp, parsedGPR, corrRxn, ht, mcheck, eta, figName, id, modelName, tol, expressionCol, cellLine)
     tName = ['mCADRE_',modelName, '_', figName, num2str(id)];
     disp(tName)
     disp('RUNNING mCADRE...')

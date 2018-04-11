@@ -35,7 +35,7 @@ if strcmp(figName,'U')
         biomassRxn = model_u.rxns(biomassRxnInd);
         atpDM = model_u.rxns(strncmp(model_u.rxns, 'DM_atp', 6) | strcmp(model_u.rxns, 'ATPM'));
         model_u = changeRxnBounds(model_u, biomassRxn, blb, 'l'); %Force biomass and ATP demand to be active
-        core = {biomassRxn,atpDM};
+        core = [biomassRxn, atpDM];
         figName = [figName,'B'];
     end
     if strcmp(bb,'F')
@@ -44,16 +44,16 @@ if strcmp(figName,'U')
     end
     expressionCol = mapExpressionToReactions(model_u, expressionData_u);
     epsil = 1;
-    run_iMat(core, model_u, expressionCol, figName, epsil, ths.p10, ths.p10, 1, modelName, tol, runtime)
-    run_iMat(core, model_u, expressionCol, figName, epsil, ths.mean, ths.mean, 2, modelName, tol, runtime)
-    run_iMat(core, model_u, expressionCol, figName, epsil, ths.p25, ths.p25, 3, modelName, tol, runtime)
-    run_iMat(core, model_u, expressionCol, figName, epsil, ths.p50, ths.p50, 4, modelName, tol, runtime)
-    run_iMat(core, model_u, expressionCol, figName, epsil, ths.mean, ths.p10, 5, modelName, tol, runtime)
-    run_iMat(core, model_u, expressionCol, figName, epsil, ths.p25, ths.p10, 6, modelName, tol, runtime)
-    run_iMat(core, model_u, expressionCol, figName, epsil, ths.p50, ths.p10, 7, modelName, tol, runtime)
-    run_iMat(core, model_u, expressionCol, figName, epsil, ths.p25, ths.mean, 8, modelName, tol, runtime)
-    run_iMat(core, model_u, expressionCol, figName, epsil, ths.p50, ths.mean, 9, modelName, tol, runtime)
-    run_iMat(core, model_u, expressionCol, figName, epsil, ths.p50, ths.p25, 10, modelName, tol, runtime)
+    run_iMat(core, model_u, expressionCol, figName, epsil, ths.p10, ths.p10, 1, modelName, tol, runtime, cellLine)
+    run_iMat(core, model_u, expressionCol, figName, epsil, ths.mean, ths.mean, 2, modelName, tol, runtime, cellLine)
+    run_iMat(core, model_u, expressionCol, figName, epsil, ths.p25, ths.p25, 3, modelName, tol, runtime, cellLine)
+    run_iMat(core, model_u, expressionCol, figName, epsil, ths.p50, ths.p50, 4, modelName, tol, runtime, cellLine)
+    run_iMat(core, model_u, expressionCol, figName, epsil, ths.mean, ths.p10, 5, modelName, tol, runtime, cellLine)
+    run_iMat(core, model_u, expressionCol, figName, epsil, ths.p25, ths.p10, 6, modelName, tol, runtime, cellLine)
+    run_iMat(core, model_u, expressionCol, figName, epsil, ths.p50, ths.p10, 7, modelName, tol, runtime, cellLine)
+    run_iMat(core, model_u, expressionCol, figName, epsil, ths.p25, ths.mean, 8, modelName, tol, runtime, cellLine)
+    run_iMat(core, model_u, expressionCol, figName, epsil, ths.p50, ths.mean, 9, modelName, tol, runtime, cellLine)
+    run_iMat(core, model_u, expressionCol, figName, epsil, ths.p50, ths.p25, 10, modelName, tol, runtime, cellLine)
 end
 
 if strcmp(figName,'C')
@@ -66,7 +66,7 @@ if strcmp(figName,'C')
         biomassRxn = model_c.rxns(biomassRxnInd);
         atpDM = model_c.rxns(strncmp(model_c.rxns, 'DM_atp', 6) | strcmp(model_c.rxns, 'ATPM'));
         model_c = changeRxnBounds(model_c, biomassRxn, blb, 'l'); %Force biomass and ATP demand to be active
-        core = {biomassRxn,atpDM};
+        core = [biomassRxn, atpDM];
         figName = [figName,'B'];
     end
     if strcmp(bb,'F')
@@ -78,21 +78,21 @@ if strcmp(figName,'C')
         biomassRxn = model_c.rxns(biomassRxnInd);
         atpDM = model_c.rxns(strncmp(model_c.rxns, 'DM_atp', 6) | strcmp(model_c.rxns, 'ATPM'));
         model_c = changeRxnBounds(model_c, biomassRxn, 1e-3, 'l'); %Force biomass and ATP demand to be active
-        core = {biomassRxn,atpDM};
+        core = [biomassRxn, atpDM];
         figName = [figName,'H'];
     end
     expressionCol = mapExpressionToReactions(model_c, expressionData_c);
     epsil = 1e-6;
-    run_iMat(core, model_c, expressionCol, figName, epsil, ths.p10, ths.p10, 1, modelName, tol, runtime)
-    run_iMat(core, model_c, expressionCol, figName, epsil, ths.mean, ths.mean, 2, modelName, tol, runtime)
-    run_iMat(core, model_c, expressionCol, figName, epsil, ths.p25, ths.p25, 3, modelName, tol, runtime)
-    run_iMat(core, model_c, expressionCol, figName, epsil, ths.p50, ths.p50, 4, modelName, tol, runtime)
-    run_iMat(core, model_c, expressionCol, figName, epsil, ths.mean, ths.p10, 5, modelName, tol, runtime)
-    run_iMat(core, model_c, expressionCol, figName, epsil, ths.p25, ths.p10, 6, modelName, tol, runtime)
-    run_iMat(core, model_c, expressionCol, figName, epsil, ths.p50, ths.p10, 7, modelName, tol, runtime)
-    run_iMat(core, model_c, expressionCol, figName, epsil, ths.p25, ths.mean, 8, modelName, tol, runtime)
-    run_iMat(core, model_c, expressionCol, figName, epsil, ths.p50, ths.mean, 9, modelName, tol, runtime)
-    run_iMat(core, model_c, expressionCol, figName, epsil, ths.p50, ths.p25, 10, modelName, tol, runtime)
+    run_iMat(core, model_c, expressionCol, figName, epsil, ths.p10, ths.p10, 1, modelName, tol, runtime, cellLine)
+    run_iMat(core, model_c, expressionCol, figName, epsil, ths.mean, ths.mean, 2, modelName, tol, runtime, cellLine)
+    run_iMat(core, model_c, expressionCol, figName, epsil, ths.p25, ths.p25, 3, modelName, tol, runtime, cellLine)
+    run_iMat(core, model_c, expressionCol, figName, epsil, ths.p50, ths.p50, 4, modelName, tol, runtime, cellLine)
+    run_iMat(core, model_c, expressionCol, figName, epsil, ths.mean, ths.p10, 5, modelName, tol, runtime, cellLine)
+    run_iMat(core, model_c, expressionCol, figName, epsil, ths.p25, ths.p10, 6, modelName, tol, runtime, cellLine)
+    run_iMat(core, model_c, expressionCol, figName, epsil, ths.p50, ths.p10, 7, modelName, tol, runtime, cellLine)
+    run_iMat(core, model_c, expressionCol, figName, epsil, ths.p25, ths.mean, 8, modelName, tol, runtime, cellLine)
+    run_iMat(core, model_c, expressionCol, figName, epsil, ths.p50, ths.mean, 9, modelName, tol, runtime, cellLine)
+    run_iMat(core, model_c, expressionCol, figName, epsil, ths.p50, ths.p25, 10, modelName, tol, runtime, cellLine)
 end
 
 if strcmp(figName,'S')
@@ -105,7 +105,7 @@ if strcmp(figName,'S')
         biomassRxn = model_s.rxns(biomassRxnInd);
         atpDM = model_s.rxns(strncmp(model_s.rxns, 'DM_atp', 6) | strcmp(model_s.rxns, 'ATPM'));
         model_s = changeRxnBounds(model_s, biomassRxn, blb, 'l'); %Force biomass and ATP demand to be active
-        core = {biomassRxn,atpDM};
+        core = [biomassRxn, atpDM];
         figName = [figName,'B'];
     end
     if strcmp(bb,'F')
@@ -114,21 +114,21 @@ if strcmp(figName,'S')
     end
     expressionCol = mapExpressionToReactions(model_s, expressionData_s);
     epsil = 1;
-    run_iMat(core, model_s, expressionCol, figName, epsil, ths.p10, ths.p10, 1, modelName, tol, runtime)
-    run_iMat(core, model_s, expressionCol, figName, epsil, ths.mean, ths.mean, 2, modelName, tol, runtime)
-    run_iMat(core, model_s, expressionCol, figName, epsil, ths.p25, ths.p25, 3, modelName, tol, runtime)
-    run_iMat(core, model_s, expressionCol, figName, epsil, ths.p50, ths.p50, 4, modelName, tol, runtime)
-    run_iMat(core, model_s, expressionCol, figName, epsil, ths.mean, ths.p10, 5, modelName, tol, runtime)
-    run_iMat(core, model_s, expressionCol, figName, epsil, ths.p25, ths.p10, 6, modelName, tol, runtime)
-    run_iMat(core, model_s, expressionCol, figName, epsil, ths.p50, ths.p10, 7, modelName, tol, runtime)
-    run_iMat(core, model_s, expressionCol, figName, epsil, ths.p25, ths.mean, 8, modelName, tol, runtime)
-    run_iMat(core, model_s, expressionCol, figName, epsil, ths.p50, ths.mean, 9, modelName, tol, runtime)
-    run_iMat(core, model_s, expressionCol, figName, epsil, ths.p50, ths.p25, 10, modelName, tol, runtime)
+    run_iMat(core, model_s, expressionCol, figName, epsil, ths.p10, ths.p10, 1, modelName, tol, runtime, cellLine)
+    run_iMat(core, model_s, expressionCol, figName, epsil, ths.mean, ths.mean, 2, modelName, tol, runtime, cellLine)
+    run_iMat(core, model_s, expressionCol, figName, epsil, ths.p25, ths.p25, 3, modelName, tol, runtime, cellLine)
+    run_iMat(core, model_s, expressionCol, figName, epsil, ths.p50, ths.p50, 4, modelName, tol, runtime, cellLine)
+    run_iMat(core, model_s, expressionCol, figName, epsil, ths.mean, ths.p10, 5, modelName, tol, runtime, cellLine)
+    run_iMat(core, model_s, expressionCol, figName, epsil, ths.p25, ths.p10, 6, modelName, tol, runtime, cellLine)
+    run_iMat(core, model_s, expressionCol, figName, epsil, ths.p50, ths.p10, 7, modelName, tol, runtime, cellLine)
+    run_iMat(core, model_s, expressionCol, figName, epsil, ths.p25, ths.mean, 8, modelName, tol, runtime, cellLine)
+    run_iMat(core, model_s, expressionCol, figName, epsil, ths.p50, ths.mean, 9, modelName, tol, runtime, cellLine)
+    run_iMat(core, model_s, expressionCol, figName, epsil, ths.p50, ths.p25, 10, modelName, tol, runtime, cellLine)
 end
 exit;
 end
 
-function run_iMat(core, model, expressionCol, figName, ~, lb, ub, id, modName, tol, runtime)
+function run_iMat(core, model, expressionCol, figName, ~, lb, ub, id, modName, tol, runtime, cellLine)
     tName = ['iMAT_',figName, num2str(id),'_',modName];
     disp(tName)
     optionsLocal = struct('solver', 'iMAT', 'expressionRxns', {expressionCol}, 'threshold_lb', lb, ...
