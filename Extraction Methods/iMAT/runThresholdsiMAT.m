@@ -131,12 +131,20 @@ end
 function run_iMat(core, model, expressionCol, figName, ~, lb, ub, id, modName, tol, runtime, cellLine)
     tName = ['iMAT_',figName, num2str(id),'_',modName];
     disp(tName)
+    cMod = call_iMAT(model, core, epsil, expressionCol, lb, ub, tol, [tName,'.txt'], runtime);
+
+    paramConsistency.epsilon=tol;
+    paramConsistency.modeFlag=0;
+    paramConsistency.method='fastcc'; 
     optionsLocal = struct('solver', 'iMAT', 'expressionRxns', {expressionCol}, 'threshold_lb', lb, ...
-                          'threshold_ub', ub, 'tol', tol, 'core', {core}, 'logFile', [tName,'.txt'], 'runtime', runtime);
+        'threshold_ub', ub, 'tol', tol, 'core', {core}, 'logFile', [tName,'.txt'], 'runtime', runtime);
     try
-        cMod = createTissueSpecificModel(model, optionsLocal, 1);
-        cMod.name = tName;
-        writeCbModel([tName,'.mat'],tName)
+        cMod2 = createTissueSpecificModel(model, optionsLocal, 1, [], paramConsistency);
+        cMod2.name = tName;
+        writeCbModel([tName,'.mat'],[tName '_2'])
+        if (~isSameCobraModel(cMod, cMod2))
+            frpintf('When running with model %s, fig %s and cell line %s, the old and new models are different!\n');
+        end
     catch ME
         warning('Failed to run iMAT on model %s, figure %s with cell line %s', modelName, [figName num2str(id)], cellLine);
         warning(ME.message)

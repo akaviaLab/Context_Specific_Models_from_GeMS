@@ -92,7 +92,7 @@ function tissueModel = call_INIT(model, eps_param, weights, tol, logfile, runtim
     tissueModel = removeRxns(model,rxnRemList); 
     inactiveRxns = CheckModelConsistency(tissueModel, tol);
     tissueModel = removeRxns(tissueModel,inactiveRxns);
-    tissueModel = removeNonUsedGenes(tissueModel);
+    tissueModel = removeUnusedGenes(tissueModel);
 end
 
 %Use a modified version to return solution when time limit is reached and

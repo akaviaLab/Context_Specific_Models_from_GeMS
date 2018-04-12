@@ -108,34 +108,34 @@ expressionData_s.value(1:length(indNum)) = num(indNum, 2);
 end
 
 function singleRun(core, model, gene_names, gene_exp, parsedGPR, corrRxn, ht, mcheck, eta, figName, id, modelName, tol, expressionCol, cellLine)
-    tName = ['mCADRE_',modelName, '_', figName, num2str(id)];
+    tName = ['mCADRE_',modelName, '_', cellLine, '_', figName, num2str(id)];
     disp(tName)
     disp('RUNNING mCADRE...')
-    cMod=call_mCADRE(model, gene_names, gene_exp, parsedGPR, corrRxn, core, ht, mcheck, eta, tol);
-    %[tissueModel, coreRxn, nonCoreRxn,	zeroExpRxns, pruneTime, cRes] = mCADRE(model, ubiquityScore, confidenceScores, protectedRxns, checkFunctionality, eta, tol)
-    % confidenceScores looks like it could be model.rxnConfidenceScores or
-    %                  model.confidenceScores in old style models
-    % eta, tol, expressionCol         Passed on to COBRATOOLBOX 3.0 mCADRE
-    % mcheck           Turns into salvageCheck (is pprp -> imp pathway
-    %                  active), not relevant in 3.0
-    %                  Also turns into metaboliteCheck, which seems to be
-    %                  replaced in 3.0 with precursor metabolites, which is
-    %                  generated automatically from protected reactions.
-    %                  It is checked if checkFunctionality == 1, so mcheck
-    %                  becomes checkFunctionality.
-    % ht               reactions with expression higher than this threshold
-    %                  will be in the core reaction set (expression
-    %                  threshold) - replace with preprocessing
-    %
-    inactiveRxns = CheckModelConsistency(cMod, tol);
-    %Make sure output model is consistent
-    if ~isempty(inactiveRxns)
-        errmsg = 'Output model is inconsistent';
-        save(['INC_',tName,'.mat'],'errmsg')
-    end
-    cMod.name = tName;
-    writeCbModel(cMod, 'mat', tName);
-    
+%     cMod=call_mCADRE(model, gene_names, gene_exp, parsedGPR, corrRxn, core, ht, mcheck, eta, tol);
+%     %[tissueModel, coreRxn, nonCoreRxn,	zeroExpRxns, pruneTime, cRes] = mCADRE(model, ubiquityScore, confidenceScores, protectedRxns, checkFunctionality, eta, tol)
+%     % confidenceScores looks like it could be model.rxnConfidenceScores or
+%     %                  model.confidenceScores in old style models
+%     % eta, tol, expressionCol         Passed on to COBRATOOLBOX 3.0 mCADRE
+%     % mcheck           Turns into salvageCheck (is pprp -> imp pathway
+%     %                  active), not relevant in 3.0
+%     %                  Also turns into metaboliteCheck, which seems to be
+%     %                  replaced in 3.0 with precursor metabolites, which is
+%     %                  generated automatically from protected reactions.
+%     %                  It is checked if checkFunctionality == 1, so mcheck
+%     %                  becomes checkFunctionality.
+%     % ht               reactions with expression higher than this threshold
+%     %                  will be in the core reaction set (expression
+%     %                  threshold) - replace with preprocessing
+%     %
+%     inactiveRxns = CheckModelConsistency(cMod, tol);
+%     %Make sure output model is consistent
+%     if ~isempty(inactiveRxns)
+%         errmsg = 'Output model is inconsistent';
+%         save(['INC_',tName,'.mat'],'errmsg')
+%     end
+%     cMod.name = tName;
+%     writeCbModel(cMod, 'mat', tName);
+     
     if (any(ismember(fieldnames(model), 'confidenceScores')))
         confidenceScores = str2double(model.confidenceScores);
     else
@@ -150,15 +150,18 @@ function singleRun(core, model, gene_names, gene_exp, parsedGPR, corrRxn, ht, mc
         'ubiquityScore', {expressionCol},...
         'confidenceScores', {confidenceScores},...
         'protectedRxns', {protectedRxns});
+    if (isempty(modelName))   % Recon1 can't produce the metabolites for the protected reaction
+        optionsLocal.checkFunctionality = 0;
+    end
     try
         cMod2 = createTissueSpecificModel(model, optionsLocal); % consistency check not required, because mCADRE seems to run it on its own
         cMod2.name = tName;
-        writeCbModel(cMod2, 'mat', [tName '2']);
+        writeCbModel(cMod2, 'mat', [tName '_2']);
+        if (~isSameCobraModel(cMod, cMod2))
+            frpintf('When running with model %s, fig %s and cell line %s, the old and new models are different!\n');
+        end
     catch ME
         warning('Failed to run mCADRE on model %s, figure %s with cell line %s', modelName, [figName num2str(id)], cellLine);
         warning(ME.message)
-    end
-    if (~isSameCobraModel(cMod, cMod2))
-        frpintf('When running with model %s, fig %s and cell line %s, the old and new models are different!\n');
     end
 end

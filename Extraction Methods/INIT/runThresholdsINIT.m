@@ -160,12 +160,19 @@ end
 function run_INIT(model, ~, figName, ~, w, id, modName, tol, runtime, cellLine)
     tName = ['INIT_',figName, num2str(id),'_',modName];
     disp(tName)
+    cMod = call_INIT(model, epsil, w, tol, [tName,'.txt'], runtime);
     optionsLocal = struct('weights', {w}, 'tol', tol, 'runtime', runtime', ...
-                         'solver', 'INIT', 'logfile', [tName,'.txt']);
+        'solver', 'INIT', 'logfile', [tName,'.txt']);
+    paramConsistency.epsilon=tol;
+    paramConsistency.modeFlag=0;
+    paramConsistency.method='fastcc';
     try
-        cMod = createTissueSpecificModel(model, optionsLocal, 1);
-        cMod.name = tName;
-        writeCbModel([tName,'.mat'],tName)
+        cMod2 = createTissueSpecificModel(model, optionsLocal, 1, [], paramConsistency);
+        cMod2.name = tName;
+        writeCbModel(cMod2, 'mat', [tName '_2']);
+        if (~isSameCobraModel(cMod, cMod2))
+            frpintf('When running with model %s, fig %s and cell line %s, the old and new models are different!\n');
+        end
     catch ME
         warning('Failed to run INIT on model %s, figure %s with cell line %s', modelName, [figName num2str(id)], cellLine);
         warning(ME.message)

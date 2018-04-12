@@ -121,12 +121,13 @@ exit;
 end
 
 function run_MBA(core, model, expressionCol, figName, mt, ut, id, modName, tol, cellLine)
-    paramConsistency.epsilon=1e-10;
-    paramConsistency.modeFlag=0;
-    paramConsistency.method='fastcc';
     tName = ['MBA','_',figName, num2str(id),'_',modName];
     disp(tName)
     %Make sure output model is consistent, if not, run again
+    paramConsistency.epsilon=tol;
+    paramConsistency.modeFlag=0;
+    paramConsistency.method='fastcc';
+    
     incon = true;
     nrun = 0;
     while incon && nrun < 10
