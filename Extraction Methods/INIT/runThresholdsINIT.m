@@ -1,5 +1,5 @@
 function runThresholdsINIT(figName, bb, modelName, cellLine)
-%initCobraToolbox
+initCobraToolbox
 load(['ID_FPKM_', cellLine, '.mat'], 'num');
 load(['growthRate_',cellLine,'.mat'], 'blb')
 load(['gene_threshold_',cellLine,'.mat'], 'ths')
@@ -21,8 +21,8 @@ expressionData_c.gene(1:length(indModel)) = model_c.genes(indModel);
 expressionData_c.value(1:length(indNum)) = num(indNum, 2);
 
 [~, indModel, indNum] = intersect(cellfun(@str2num, model_s.genes), num(:, 1));
-expressionData_c.gene(1:length(indModel)) = model_s.genes(indModel);
-expressionData_c.value(1:length(indNum)) = num(indNum, 2);
+expressionData_s.gene(1:length(indModel)) = model_s.genes(indModel);
+expressionData_s.value(1:length(indNum)) = num(indNum, 2);
 
 if strcmp(figName,'U')
     tol = 1e-6;
@@ -157,10 +157,11 @@ end
 exit;
 end
 
-function run_INIT(model, ~, figName, ~, w, id, modName, tol, runtime, cellLine)
+function run_INIT(model, ~, figName, epsil, w, id, modName, tol, runtime, cellLine)
     tName = ['INIT_',figName, num2str(id),'_',modName];
     disp(tName)
     cMod = call_INIT(model, epsil, w, tol, [tName,'.txt'], runtime);
+    writeCbModel(cMod, 'mat', tname);
     optionsLocal = struct('weights', {w}, 'tol', tol, 'runtime', runtime', ...
         'solver', 'INIT', 'logfile', [tName,'.txt']);
     paramConsistency.epsilon=tol;

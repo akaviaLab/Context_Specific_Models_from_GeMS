@@ -26,7 +26,7 @@ expressionData_s.value(1:length(indNum)) = num(indNum, 2);
 
 if strcmp(figName,'U')
     %UNCONSTRAINED
-    core = {};
+    core = [];
     if strcmp(bb,'B')
         biomassRxnInd = strcmpi(model_u.rxns, 'biomass_reaction');
         atpDMInd = strncmp(model_u.rxns, 'DM_atp', 6) | strcmp(model_u.rxns, 'ATPM');
@@ -49,7 +49,7 @@ end
 
 if strcmp(figName,'C')
     %CONSTRAINED
-    core = {};
+    core = [];
     if strcmp(bb,'B')
         biomassRxnInd = strcmpi(model_c.rxns, 'biomass_reaction');
         atpDMInd = strncmp(model_c.rxns, 'DM_atp', 6) | strcmp(model_c.rxns, 'ATPM');
@@ -79,7 +79,7 @@ end
 
 if strcmp(figName,'S')
     %CONSTRAINED
-    core = {};
+    core = [];
     if strcmp(bb,'B')
         biomassRxnInd = strcmpi(model_s.rxns, 'biomass_reaction');
         atpDMInd = strncmp(model_s.rxns, 'DM_atp', 6) | strcmp(model_s.rxns, 'ATPM');
@@ -92,6 +92,8 @@ if strcmp(figName,'S')
         figName = [figName,'F'];
     end
     epsil = 1e-6;
+    scaling = 1e3;
+    
     expressionCol = mapExpressionToReactions(model_s, expressionData_s);
     singleRun(core, expressionCol, figName, model_s, epsil, ths.p10, 1, modelName, cellLine)
     singleRun(core, expressionCol, figName, model_s, epsil, ths.mean, 2, modelName, cellLine)
@@ -106,10 +108,17 @@ tName = ['FastCore_',modelName, '_', figName, num2str(id),'_',cellLine];
 disp(tName)
 C = find(expressionCol >= th);
 C = union(C, core);
+cMod = call_fastcore(model, expressionCol, core, th, epsil, scaling);
+cMod.name = tName;
+writeCbModel(cMod, 'mat', tName);
 try
-    cMod = fastcore(model, C, epsil);
-    cMod.name = tName;
-    writeCbModel(cMod, 'mat', tName);
+    cMod2 = fastcore(model, C); % Trying to run it with default values, without changes in epsilon and without scaling factor
+    cMod2.name = tName;
+    writeCbModel(cMod2, 'mat', [tName '_2']);
+    % Also trying with very low epsilon
+     cMod3 = fastcore(model, C, 1e-10);
+    cMod3.name = tName;
+    writeCbModel(cMod3, 'mat', [tName '_3']);
 catch ME
     warning('Failed to run fastcore on model %s, figure %s with cell line %s', modelName, [figName num2str(id)], cellLine);
     warning(ME.message)

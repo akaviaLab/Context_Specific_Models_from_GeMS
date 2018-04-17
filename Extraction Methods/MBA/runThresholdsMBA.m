@@ -1,4 +1,5 @@
 function runThresholdsMBA(figName, bb, modelName, cellLine)
+initCobraToolbox
 load(['ID_FPKM_', cellLine, '.mat'], 'num');
 load(['growthRate_',cellLine,'.mat'], 'blb')
 load(['gene_threshold_',cellLine,'.mat'], 'ths')

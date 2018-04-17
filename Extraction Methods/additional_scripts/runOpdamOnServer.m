@@ -1,6 +1,6 @@
 function runOpdamOnServer(extractionMethod, figName, bbLetter, modelName, cellLine)
 
-addpath /gs/scratch/uda2013/cobratoolbox/; % So matlab on the server has cobratoolbox
+addpath('/gs/home/uda2013/cobratoolbox/'); % So matlab on the server has cobratoolbox
 % give number of workers for parallelization
 pc = parcluster('local');
 pc.JobStorageLocation = strcat('/localscratch/', getenv('PBS_JOBID')); % Which directory are the threads using to communicate

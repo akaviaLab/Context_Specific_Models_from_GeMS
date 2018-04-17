@@ -85,7 +85,8 @@ function tissueModel = call_INIT(model, eps_param, weights, tol, logfile, runtim
     MILPproblem.osense = -1;
     MILPproblem.x0 = [];
 
-    solution = solveCobraMILP_loc(MILPproblem, 'timeLimit', runtime, 'logFile', logfile, 'printLevel', 3);
+    % The local version fails with gurobi and cplex
+    solution = solveCobraMILP(MILPproblem, 'timeLimit', runtime, 'logFile', logfile, 'printLevel', 3);
     
     x = solution.cont;
     rxnRemList = model.rxns(abs(x) < tol);
