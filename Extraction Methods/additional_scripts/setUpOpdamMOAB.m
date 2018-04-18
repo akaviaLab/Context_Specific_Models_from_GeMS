@@ -26,7 +26,7 @@ figures = {'U', 'C', 'S'};
 methodsToGenerateModels = {'GIMME', 'fastcore', 'MBA', 'iMAT', 'INIT', 'mCADRE'};
 fprintf('Setting up analysis on cell line %s\n', cellLine);
 
-submissionFile = fprintf('allSubmit%s_%s.sh', cellLine, modelName);
+submissionFile = sprintf('allSubmit%s_%s.sh', cellLine, modelName);
 fidSubmission = fopen(submissionFile, 'w');
 fprintf(fidSubmission, '#!/bin/bash\n\n');
 
@@ -40,7 +40,7 @@ for method = methodsToGenerateModels
             shFileName = sprintf('subThresholds%s_%s_%s_%s.sh', method{:}, modelName, cellLine, strcat(currentFig{:}, currentbb{:}));
             %matlabFileName = sprintf('runThresholds%s_%s_%s%s.m', method{:}, modelName, cellLine, strcat(currentFig{:}, currentbb{:}));
             fid = fopen(shFileName, 'w');
-            fprintf(fid, '#PBS -l walltime=12:00:00\n#PBS -l nodes=1:ppn=6\n#PBS -A iii-973-aa\n\n\n');
+            fprintf(fid, '#PBS -l walltime=24:00:00\n#PBS -l nodes=1:ppn=6\n#PBS -A iii-973-aa\n\n\n');
             fprintf(fid, 'cd /gs/scratch/uda2013/Opdam/%s\n', outputName);
             fprintf(fid, 'matlab -nodisplay -r \"');
             fprintf(fid, 'addpath(genpath(''%s'')); ', opdamRemoteDirectory);

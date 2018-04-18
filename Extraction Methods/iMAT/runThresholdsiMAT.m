@@ -128,14 +128,15 @@ end
 exit;
 end
 
-function run_iMat(core, model, expressionCol, figName, ~, lb, ub, id, modName, tol, runtime, cellLine)
+function run_iMat(core, model, expressionCol, figName, epsil, lb, ub, id, modName, tol, runtime, cellLine)
     tName = ['iMAT_',figName, num2str(id),'_',modName];
     disp(tName)
+    changeCobraSolver('ibm_cplex', 'all')  % Glpk fails when using CheckModelConsistency which is called from call_iMAT
+    
     cMod = call_iMAT(model, core, epsil, expressionCol, lb, ub, tol, [tName,'.txt'], runtime);
-
     paramConsistency.epsilon=tol;
     paramConsistency.modeFlag=0;
-    paramConsistency.method='fastcc'; 
+    paramConsistency.method='fastcc';
     optionsLocal = struct('solver', 'iMAT', 'expressionRxns', {expressionCol}, 'threshold_lb', lb, ...
         'threshold_ub', ub, 'tol', tol, 'core', {core}, 'logFile', [tName,'.txt'], 'runtime', runtime);
     try

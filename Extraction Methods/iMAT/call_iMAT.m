@@ -95,7 +95,7 @@ function tissueModel = call_iMAT(model, manualRH, eps_param, expressionCol, lowe
     MILPproblem.osense = -1;
     MILPproblem.x0 = [];
 
-    solution = solveCobraMILP_loc(MILPproblem, 'timeLimit', runtime, 'logFile', logfile, 'printLevel', 3);
+    solution = solveCobraMILP(MILPproblem, 'timeLimit', runtime, 'logFile', logfile, 'printLevel', 3);
     
     x = solution.cont;
     rxnRemList = model.rxns(abs(x) < tol);
