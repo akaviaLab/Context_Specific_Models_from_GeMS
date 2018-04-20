@@ -1,4 +1,6 @@
 %% load model and replace HGNC ids with entrez IDs
+rootDirectory = '~/Documents/MetaboGenomics';
+opdamDirectory = fullfile(rootDirectory, 'Codes', 'ModelPerformanceTests', 'OpdamCellSystems2017');
 recon2_2 = readCbModel('~/Documents/MetaboGenomics/Data/RECON2.2.mat');
 hgncToEnsemblFile = '~/Documents/Data/General/HGNC_gene_with_protein_product.2018-Jan-22.txt';
 hgncEnsembl = readtable(hgncToEnsemblFile);
@@ -13,11 +15,17 @@ recon2_2 = removeFieldEntriesForType(recon2_2, indRemove, 'genes', numel(recon2_
 recon2_2.genes(indModel) = arrayfun(@(x) sprintf('%s', num2str(x)), hgncEtrez.entrez_id(indEntrez), 'UniformOutput', false);
 recon2_2 = creategrRulesField(recon2_2);
 %% constrain model
-model_c = constrainModel(recon2_2, 'C', 'A375');
-model_s = constrainModel(recon2_2, 'S', 'A375');
-model_u = constrainModel(recon2_2, 'U', 'A375');
+cellLines = {'HL60', 'K562', 'KBM7'}; %{'A375', 'HL60', 'K562', 'KBM7'};
+for i=1:length(cellLines)
+    currentCellLine = cellLines{i};
+    model_c = constrainModel(recon2_2, 'C', currentCellLine);
+    model_s = constrainModel(recon2_2, 'S', currentCellLine);
+    model_u = constrainModel(recon2_2, 'U', currentCellLine);
+    outputName = fullfile( opdamDirectory, 'Models and Data', currentCellLine, sprintf('recon2_2_%s.mat', currentCellLine));
+    save(outputName, 'model_u', 'model_c', 'model_s', 'recon2_2');
+end
 
-save('/Users/uridavidakavia/Documents/MetaboGenomics/Codes/ModelPerformanceTests/OpdamCellSystems2017/Models and data/A375/recon2_2_A375.mat', 'model_u', 'model_c', 'model_s', 'recon2_2');
+
 % %% Original removeIsoGenes did not remove geneNames. This fixes that bug
 % [~, genesToDelete] = setdiff(recon2_2.genes, model_u.genes);
 % model_u.geneNames(genesToDelete) = '';

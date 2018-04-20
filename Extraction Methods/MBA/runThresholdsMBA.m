@@ -131,17 +131,11 @@ function run_MBA(core, model, expressionCol, figName, mt, ut, id, modName, tol, 
     
     incon = true;
     nrun = 0;
+    % MBA function runs until there are no inconsistent reactions, without
+    % limitations on nmber of runs. Needs to be clarified
     while incon && nrun < 10
-        indH = find(expressionCol > ut);
-        indM = find(expressionCol >= mt & expressionCol <= ut);
-        CH = union(model.rxns(indH),core); %#ok<FNDSB>
-        CM = model.rxns(indM); %#ok<FNDSB>
-        try
-            cMod = MBA(model, CM, CH, tol);
-        catch ME
-            warning('Failed to run MBA on model %s, figure %s with cell line %s', modelName, [figName num2str(id)], cellLine);
-            warning(ME.message)
-        end
+        cMod = call_MBA(model, expressionCol, core, mt, ut, 0.5, tol);
+        
         nrun = nrun + 1;
         [~,~, ~, fluxInConsistentRxnBool] = findFluxConsistentSubset(cMod,paramConsistency);
         if (sum(fluxInConsistentRxnBool) == 0)
@@ -156,4 +150,23 @@ function run_MBA(core, model, expressionCol, figName, mt, ut, id, modName, tol, 
     cMod.name = tName;
     writeCbModel(cMod, 'mat', tName);
     disp(' ')
+    
+    indH = find(expressionCol > ut);
+    indM = find(expressionCol >= mt & expressionCol <= ut);
+    CH = union(model.rxns(indH),core); %#ok<FNDSB>
+    CM = model.rxns(indM); %#ok<FNDSB>
+    NC = setdiff(model.rxns, union(CH, CM));
+    %Biomass metabolite sinks are not pruned in call_MBA
+    CM = union(CM, NC(contains(NC, 'BMS_')));
+    
+    try
+        cMod2 = MBA(model, CM, CH, tol);
+        disp(['Number of rxns: ',num2str(numel(cMod.rxns))])
+        cMod2.name = tName;
+        writeCbModel(cMod2, 'mat', [tName '_2']);
+    catch ME
+        warning('Failed to run MBA on model %s, figure %s with cell line %s', modelName, [figName num2str(id)], cellLine);
+        warning(ME.message)
+    end
+        
 end

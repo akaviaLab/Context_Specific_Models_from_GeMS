@@ -70,7 +70,7 @@ function singleRun(model, expressionCol, ut, obj_frac, figName, id, modelName, c
         cMod2.name = tName;
         writeCbModel(cMod2, 'mat', [tName '_2']);
         if (~isSameCobraModel(cMod2, cMod2))
-            frpintf('When running with model %s, fig %s and cell line %s, the old and new models are different!\n');
+            fprintf('When running GIMME with model %s, fig %s and cell line %s, the old and new models are different!\n', modelName, figName);
         end
     catch ME
         warning('Failed to run GIMME on model %s, figure %s with cell line %s', modelName, [figName num2str(id)], cellLine);

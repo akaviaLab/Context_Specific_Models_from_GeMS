@@ -28,8 +28,8 @@ if strcmp(figName,'U')
     %UNCONSTRAINED
     core = [];
     if strcmp(bb,'B')
-        biomassRxnInd = strcmpi(model_u.rxns, 'biomass_reaction');
-        atpDMInd = strncmp(model_u.rxns, 'DM_atp', 6) | strcmp(model_u.rxns, 'ATPM');
+        biomassRxnInd = find(strcmpi(model_u.rxns, 'biomass_reaction'));
+        atpDMInd = find(strncmp(model_u.rxns, 'DM_atp', 6) | strcmp(model_u.rxns, 'ATPM'));
         model_u = changeRxnBounds(model_u, model_u.rxns(biomassRxnInd), blb, 'l'); %Force biomass and ATP demand to be active
         core = [biomassRxnInd,atpDMInd];
         figName = [figName,'B'];
@@ -51,8 +51,8 @@ if strcmp(figName,'C')
     %CONSTRAINED
     core = [];
     if strcmp(bb,'B')
-        biomassRxnInd = strcmpi(model_c.rxns, 'biomass_reaction');
-        atpDMInd = strncmp(model_c.rxns, 'DM_atp', 6) | strcmp(model_c.rxns, 'ATPM');
+        biomassRxnInd = find(strcmpi(model_c.rxns, 'biomass_reaction'));
+        atpDMInd = find(strncmp(model_c.rxns, 'DM_atp', 6) | strcmp(model_c.rxns, 'ATPM'));
         model_c = changeRxnBounds(model_c, model_c.rxns(biomassRxnInd), blb, 'l'); %Force biomass and ATP demand to be active
         core = [biomassRxnInd,atpDMInd];
         figName = [figName,'B'];
@@ -62,8 +62,8 @@ if strcmp(figName,'C')
         figName = [figName,'F'];
     end
     if strcmp(bb,'H')
-        biomassRxnInd = strcmpi(model_c.rxns, 'biomass_reaction');
-        atpDMInd = strncmp(model_c.rxns, 'DM_atp', 6) | strcmp(model_c.rxns, 'ATPM');
+        biomassRxnInd = find(strcmpi(model_c.rxns, 'biomass_reaction'));
+        atpDMInd = find(strncmp(model_c.rxns, 'DM_atp', 6) | strcmp(model_c.rxns, 'ATPM'));
         model_c = changeRxnBounds(model_c, model_c.rxns(biomassRxnInd), 1e-3, 'l'); %Force biomass and ATP demand to be active
         core = [biomassRxnInd,atpDMInd];
         figName = [figName,'H'];
@@ -81,8 +81,8 @@ if strcmp(figName,'S')
     %CONSTRAINED
     core = [];
     if strcmp(bb,'B')
-        biomassRxnInd = strcmpi(model_s.rxns, 'biomass_reaction');
-        atpDMInd = strncmp(model_s.rxns, 'DM_atp', 6) | strcmp(model_s.rxns, 'ATPM');
+        biomassRxnInd = find(strcmpi(model_s.rxns, 'biomass_reaction'));
+        atpDMInd = find(strncmp(model_s.rxns, 'DM_atp', 6) | strcmp(model_s.rxns, 'ATPM'));
         model_s = changeRxnBounds(model_s, model_s.rxns(biomassRxnInd), blb, 'l'); %Force biomass and ATP demand to be active
         core = [biomassRxnInd,atpDMInd];
         figName = [figName,'B'];
@@ -106,13 +106,13 @@ end
 function singleRun(core, expressionCol, figName, model, epsil, scaling, th, id, modelName, cellLine)
 tName = ['FastCore_',modelName, '_', figName, num2str(id),'_',cellLine];
 disp(tName)
-C = find(expressionCol >= th);
-C = union(C, core);
-cMod = call_fastcore(model, expressionCol, core, th, epsil, scaling);
+cMod = call_fastcore(model, expressionCol, model.rxns(core), th, epsil, scaling);
 cMod.name = tName;
 writeCbModel(cMod, 'mat', tName);
+C = find(expressionCol >= th);
+C = union(C, core);
 try
-    cMod2 = fastcore(model, C); % Trying to run it with default values, without changes in epsilon and without scaling factor
+    cMod2 = fastcore(model, C); 
     cMod2.name = tName;
     writeCbModel(cMod2, 'mat', [tName '_2']);
 catch ME

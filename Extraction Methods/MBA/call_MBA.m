@@ -47,7 +47,7 @@ function tissueModel = call_MBA(model, expressionCol, core, mt, ut, epsil, tol)
     end
 
 
-    tissueModel = removeNonUsedGenes(PM);
+    tissueModel = removeUnusedGenes(PM);
     
     is_active = fastcc(tissueModel, tol);
     inactiveRxns = setdiff(tissueModel.rxns, tissueModel.rxns(is_active));

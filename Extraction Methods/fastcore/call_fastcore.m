@@ -77,7 +77,7 @@ function tissueModel = call_fastcore(model, expressionCol, core, th, tol, scalin
     
     toRem = setdiff(model.rxns,model.rxns(A));
     tissueModel = removeRxns(model_orig, toRem);
-    tissueModel = removeNonUsedGenes(tissueModel);
+    tissueModel = removeUnusedGenes(tissueModel);
     toc
 end
 

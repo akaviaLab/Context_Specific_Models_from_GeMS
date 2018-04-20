@@ -157,12 +157,13 @@ end
 exit;
 end
 
-function run_INIT(model, ~, figName, epsil, w, id, modName, tol, runtime, cellLine)
-    tName = ['INIT_',figName, num2str(id),'_',modName];
+function run_INIT(model, ~, figName, epsil, w, id, modelName, tol, runtime, cellLine)
+    tName = ['INIT_',figName, num2str(id),'_',modelName,'_',cellLine];
     disp(tName)
     changeCobraSolver('ibm_cplex', 'all')  % Glpk fails when using CheckModelConsistency which is called from call_INIT
     cMod = call_INIT(model, epsil, w, tol, [tName,'.txt'], runtime);
-    writeCbModel(cMod, 'mat', tname);
+    cMod.name = tName;
+    writeCbModel(cMod, 'mat', tName);
     optionsLocal = struct('weights', {w}, 'tol', tol, 'runtime', runtime', ...
         'solver', 'INIT', 'logfile', [tName,'.txt']);
     paramConsistency.epsilon=tol;

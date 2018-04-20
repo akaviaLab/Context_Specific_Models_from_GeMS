@@ -3,9 +3,13 @@
 
 .gitignore~
 
-CobraMILPSolver.log
-MILPProblem.mat
+*/CobraMILPSolver.log
+*/*MILPProblem.mat
+
+*.log
 
 *recon2_2*.mat
 
-extractedModels/*
+extractedModels/**
+
+Extraction\ Methods/*.mat

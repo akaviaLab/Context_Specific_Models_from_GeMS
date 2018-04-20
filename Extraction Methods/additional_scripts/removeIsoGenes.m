@@ -17,8 +17,8 @@ function modelNew=removeIsoGenes(model)
     modelNew=model;
     [~, indToKeep, indNew] = intersect(originalGenes, modelNew.genes);
     indToRemove = setdiff(1:length(originalGenes), indNew);
-    for currentField=relevantFields'
-        modelNew.(currentField{:})(indNew) = model.(currentField{:})(indToKeep);
-        modelNew.(currentField{:})(indToRemove) = '';
+    for i=1:length(relevantFields)
+        modelNew.(relevantFields{i})(indNew) = model.(relevantFields{i})(indToKeep);
+        modelNew.(relevantFields{i})(indToRemove) = '';
     end
 end
