@@ -1,6 +1,8 @@
 function runOpdamOnServer(extractionMethod, figName, bbLetter, modelName, cellLine)
 
 addpath('/gs/home/uda2013/cobratoolbox/'); % So matlab on the server has cobratoolbox
+initCobraToolbox;
+changeCobraSolver('ibm_cplex', 'all') % Glpk fails when using CheckModelConsistency (on the server?)
 % give number of workers for parallelization
 pc = parcluster('local');
 pc.JobStorageLocation = strcat('/localscratch/', getenv('PBS_JOBID')); % Which directory are the threads using to communicate

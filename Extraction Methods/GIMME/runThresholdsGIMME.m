@@ -1,5 +1,5 @@
 function runThresholdsGIMME(figName, modelName, cellLine)
-initCobraToolbox
+%initCobraToolbox
 load(['ID_FPKM_', cellLine, '.mat'], 'num');
 load(['growthRate_',cellLine,'.mat'], 'blb')
 load(['gene_threshold_',cellLine,'.mat'], 'ths')

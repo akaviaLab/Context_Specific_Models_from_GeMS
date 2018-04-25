@@ -1,6 +1,6 @@
 function runThresholdsiMAT(figName, bb, modelName, cellLine)
 
-initCobraToolbox
+%initCobraToolbox
 load(['ID_FPKM_', cellLine, '.mat'], 'num');
 load(['growthRate_',cellLine,'.mat'], 'blb')
 load(['gene_threshold_',cellLine,'.mat'], 'ths')
@@ -131,9 +131,9 @@ end
 function run_iMat(core, model, expressionCol, figName, epsil, lb, ub, id, modelName, tol, runtime, cellLine)
     tName = ['iMAT_',figName, num2str(id),'_',modelName,'_',cellLine];
     disp(tName)
-    changeCobraSolver('ibm_cplex', 'all')  % Glpk fails when using CheckModelConsistency which is called from call_iMAT
-    
+    tic
     cMod = call_iMAT(model, core, epsil, expressionCol, lb, ub, tol, [tName,'.txt'], runtime);
+    toc
     cMod.name = tName;
     writeCbModel(cMod, 'mat', tName)
     paramConsistency.epsilon=tol;
@@ -142,7 +142,9 @@ function run_iMat(core, model, expressionCol, figName, epsil, lb, ub, id, modelN
     optionsLocal = struct('solver', 'iMAT', 'expressionRxns', {expressionCol}, 'threshold_lb', lb, ...
         'threshold_ub', ub, 'tol', tol, 'core', {core}, 'logfile', [tName,'_2.txt'], 'runtime', runtime);
     try
+        tic
         cMod2 = createTissueSpecificModel(model, optionsLocal, 1, [], paramConsistency);
+        toc
         cMod2.name = tName;
         writeCbModel(cMod2, 'mat', [tName '_2'])
         if (~isSameCobraModel(cMod, cMod2))

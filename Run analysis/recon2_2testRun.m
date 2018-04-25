@@ -8,14 +8,17 @@ hgncComplexLocusrFile = '~/Documents/Data/General/HGNCcomplex_locus_constituent.
 hgncComplexLocus = readtable(hgncComplexLocusrFile);
 hgncEtrez = [hgncEnsembl(:, {'hgnc_id', 'entrez_id'}); hgncComplexLocus(:, {'hgnc_id', 'entrez_id'})];
 % Almost all RECON 2.2 genes have Entrez IDs, except for pseudogene(s) and
-% read-through(s) which are irrelevan
+% read-through(s) which are irrelevant
 [genesRemoved, indRemove] = setdiff(recon2_2.genes, hgncEtrez.hgnc_id);
 recon2_2 = removeFieldEntriesForType(recon2_2, indRemove, 'genes', numel(recon2_2.genes)); 
 [~, indModel, indEntrez] = intersect(recon2_2.genes, hgncEtrez.hgnc_id);
+% This probably won't work in Matlab R2018a, since it looks like the
+% default behavoir of readtable has changed. In those ones, you can
+% probably use recon2_2.genes(indModel)=hgncEtrez.entrez_id(indEntrez)
 recon2_2.genes(indModel) = arrayfun(@(x) sprintf('%s', num2str(x)), hgncEtrez.entrez_id(indEntrez), 'UniformOutput', false);
 recon2_2 = creategrRulesField(recon2_2);
 %% constrain model
-cellLines = {'HL60', 'K562', 'KBM7'}; %{'A375', 'HL60', 'K562', 'KBM7'};
+cellLines = {'A375', 'HL60', 'K562', 'KBM7'};
 for i=1:length(cellLines)
     currentCellLine = cellLines{i};
     model_c = constrainModel(recon2_2, 'C', currentCellLine);

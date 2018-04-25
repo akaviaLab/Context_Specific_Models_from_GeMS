@@ -1,5 +1,5 @@
 function runThresholdsMBA(figName, bb, modelName, cellLine)
-initCobraToolbox
+%initCobraToolbox
 load(['ID_FPKM_', cellLine, '.mat'], 'num');
 load(['growthRate_',cellLine,'.mat'], 'blb')
 load(['gene_threshold_',cellLine,'.mat'], 'ths')
@@ -164,6 +164,9 @@ function run_MBA(core, model, expressionCol, figName, mt, ut, id, modName, tol, 
         disp(['Number of rxns: ',num2str(numel(cMod.rxns))])
         cMod2.name = tName;
         writeCbModel(cMod2, 'mat', [tName '_2']);
+        if (~isSameCobraModel(cMod2, cMod2))
+            fprintf('When running MBA with model %s, fig %s and cell line %s, the old and new models are different!\n', modelName, figName);
+        end
     catch ME
         warning('Failed to run MBA on model %s, figure %s with cell line %s', modelName, [figName num2str(id)], cellLine);
         warning(ME.message)

@@ -30,7 +30,8 @@ function new_model = constrainModel(model, constr,cellType)
     
     %Initially constrain exchange reactions to zero uptake for S and C
     if strcmp(constr,'S') || strcmp(constr,'C')
-        rxnsOpen = {'EX_ca2(e)';'EX_cl(e)';'EX_co(e)';'EX_co2(e)';'EX_fe2(e)';'EX_fe3(e)';'EX_h(e)';'EX_h2o(e)';'EX_h2o2(e)';'EX_hco3(e)';'EX_i(e)';'EX_k(e)';'EX_na1(e)';'EX_nh4(e)';'EX_no(e)';'EX_o2(e)';'EX_o2s(e)';'EX_oh1';'EX_oxa(e)';'EX_pi(e)';'EX_sel(e)';'EX_so4(e)';'EX_tcynt(e)';'EX_tsul(e)'};
+        rxnsOpen = {'EX_ca2(e)';'EX_cl(e)';'EX_co(e)';'EX_co2(e)';'EX_fe2(e)';'EX_fe3(e)';'EX_h(e)';'EX_h2o(e)';'EX_h2o2(e)';'EX_hco3(e)';'EX_i(e)';'EX_k(e)';'EX_na1(e)';'EX_nh4(e)';'EX_no(e)';'EX_o2(e)';'EX_o2s(e)';'EX_oxa(e)';'EX_pi(e)';'EX_sel(e)';'EX_so4(e)';'EX_tcynt(e)';'EX_tsul(e)'};
+        rxnsOpen = union(rxnsOpen, model.rxns(strncmp(model.rxns, 'EX_oh1', 6))); % Ex_oh1 in Recon 1, Ex_oh1(e) in Recon 2, 2.2
         new_model = changeRxnBounds(new_model,new_model.rxns(new_model.ExchRxnBool),0,'l');
         new_model = changeRxnBounds(new_model,rxnsOpen,-1000,'l');
     end

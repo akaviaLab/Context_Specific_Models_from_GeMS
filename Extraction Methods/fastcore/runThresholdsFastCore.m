@@ -1,5 +1,5 @@
 function runThresholdsFastCore(figName, bb, modelName, cellLine)
-initCobraToolbox
+%initCobraToolbox
 load(['ID_FPKM_', cellLine, '.mat'], 'num');
 load(['growthRate_',cellLine,'.mat'], 'blb')
 load(['gene_threshold_',cellLine,'.mat'], 'ths')
@@ -111,21 +111,16 @@ cMod.name = tName;
 writeCbModel(cMod, 'mat', tName);
 C = find(expressionCol >= th);
 C = union(C, core);
+optionsLocal = struct('solver', 'fastCore', 'core', {C}, 'epsilon', epsil);
 try
-    cMod2 = fastcore(model, C); 
+    cMod2 = createTissueSpecificModel(model, optionsLocal);
     cMod2.name = tName;
     writeCbModel(cMod2, 'mat', [tName '_2']);
+    if (~isSameCobraModel(cMod2, cMod2))
+        fprintf('When running fastcore with model %s, fig %s and cell line %s, the old and new models are different!\n', modelName, figName);
+    end
 catch ME
     warning('Failed to run fastcore on model %s, figure %s with cell line %s', modelName, [figName num2str(id)], cellLine);
-    warning(ME.message)
-end
-try
-        % Also trying with very low epsilon
-     cMod3 = fastcore(model, C, 1e-10);
-    cMod3.name = tName;
-    writeCbModel(cMod3, 'mat', [tName '_3']);
-catch ME
-    warning('Failed to run fastcore with low epsilon on model %s, figure %s with cell line %s', modelName, [figName num2str(id)], cellLine);
     warning(ME.message)
 end
 end

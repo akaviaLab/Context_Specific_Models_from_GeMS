@@ -1,5 +1,5 @@
 function runThresholdsINIT(figName, bb, modelName, cellLine)
-initCobraToolbox
+%initCobraToolbox
 load(['ID_FPKM_', cellLine, '.mat'], 'num');
 load(['growthRate_',cellLine,'.mat'], 'blb')
 load(['gene_threshold_',cellLine,'.mat'], 'ths')
@@ -61,7 +61,7 @@ if strcmp(figName,'C')
         biomassRxnInd = strcmpi(model_c.rxns, 'biomass_reaction');
         biomassRxn = model_c.rxns(biomassRxnInd);
         atpDM = model_c.rxns(strncmp(model_c.rxns, 'DM_atp', 6) | strcmp(model_c.rxns, 'ATPM'));
-        model = changeRxnBounds(model_c, biomassRxn, blb, 'l'); %Force biomass and ATP demand to be active
+        model = changeRxnBounds(model_c, biomassRxn, 1e-3, 'l'); %Force biomass and ATP demand to be active
         figName = [figName,'H'];
     end
     expressionCol = mapExpressionToReactions(model_c, expressionData_c);
@@ -160,7 +160,6 @@ end
 function run_INIT(model, ~, figName, epsil, w, id, modelName, tol, runtime, cellLine)
     tName = ['INIT_',figName, num2str(id),'_',modelName,'_',cellLine];
     disp(tName)
-    changeCobraSolver('ibm_cplex', 'all')  % Glpk fails when using CheckModelConsistency which is called from call_INIT
     cMod = call_INIT(model, epsil, w, tol, [tName,'.txt'], runtime);
     cMod.name = tName;
     writeCbModel(cMod, 'mat', tName);

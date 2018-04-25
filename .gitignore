@@ -4,7 +4,7 @@
 .gitignore~
 
 */CobraMILPSolver.log
-*/*MILPProblem.mat
+**MILPProblem.mat
 
 *.log
 
@@ -12,4 +12,5 @@
 
 extractedModels/**
 
-Extraction\ Methods/*.mat
+Extraction\ Methods/**/*.mat
+Extraction\ Methods/**/*.txt
