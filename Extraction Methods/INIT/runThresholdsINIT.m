@@ -173,7 +173,7 @@ function run_INIT(model, ~, figName, epsil, w, id, modelName, tol, runtime, cell
         cMod2.name = tName;
         writeCbModel(cMod2, 'mat', [tName '_2']);
         if (~isSameCobraModel(cMod, cMod2))
-            frpintf('When running with model %s, fig %s and cell line %s, the old and new models are different!\n');
+            fprintf('When running INIT with model %s, fig %s and cell line %s, the old and new models are different!\n', modelName, figName, cellLine);
         end
     catch ME
         warning('Failed to run INIT on model %s, figure %s with cell line %s', modelName, [figName num2str(id)], cellLine);

@@ -148,7 +148,7 @@ function run_iMat(core, model, expressionCol, figName, epsil, lb, ub, id, modelN
         cMod2.name = tName;
         writeCbModel(cMod2, 'mat', [tName '_2'])
         if (~isSameCobraModel(cMod, cMod2))
-            fprintf('When running iMAT with model %s, fig %s and cell line %s, the old and new models are different!\n', modelName, figName);
+            fprintf('When running iMAT with model %s, fig %s and cell line %s, the old and new models are different!\n', modelName, figName, cellLine);
         end
     catch ME
         warning('Failed to run iMAT on model %s, figure %s with cell line %s', modelName, [figName num2str(id)], cellLine);
