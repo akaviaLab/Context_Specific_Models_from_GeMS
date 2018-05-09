@@ -164,8 +164,8 @@ function run_MBA(core, model, expressionCol, figName, mt, ut, id, modName, tol, 
         disp(['Number of rxns: ',num2str(numel(cMod.rxns))])
         cMod2.name = tName;
         writeCbModel(cMod2, 'mat', [tName '_2']);
-        if (~isSameCobraModel(cMod2, cMod2))
-            fprintf('When running MBA with model %s, fig %s and cell line %s, the old and new models are different!\n', modelName, figName, cellLine);
+        if (~isSameCobraModel(cMod, cMod2))
+            fprintf('When running MBA model %s, cell line %s, fig %s, id %d, the old and new models are different!\n', modelName, cellLine, figName, id);
         end
     catch ME
         warning('Failed to run MBA on model %s, figure %s with cell line %s', modelName, [figName num2str(id)], cellLine);

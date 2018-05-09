@@ -32,7 +32,7 @@ fprintf(fidSubmission, '#!/bin/bash\n\n');
 
 for method = methodsToGenerateModels
     timeToRun = 3;
-    if (any(strcmp(method, {'mCADRE', 'MBA', 'INIT'})))
+    if (any(strcmp(method, {'mCADRE', 'MBA', 'INIT', 'iMAT'})))
         timeToRun = 48;
     end
     for currentFig = figures

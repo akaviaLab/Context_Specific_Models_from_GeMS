@@ -160,6 +160,8 @@ end
 function run_INIT(model, ~, figName, epsil, w, id, modelName, tol, runtime, cellLine)
     tName = ['INIT_',figName, num2str(id),'_',modelName,'_',cellLine];
     disp(tName)
+    % The default epsilon in createTissueModel is 1, which means it works
+    % for 'S' and 'U'. It fails for 'C'
     cMod = call_INIT(model, epsil, w, tol, [tName,'.txt'], runtime);
     cMod.name = tName;
     writeCbModel(cMod, 'mat', tName);
@@ -173,7 +175,7 @@ function run_INIT(model, ~, figName, epsil, w, id, modelName, tol, runtime, cell
         cMod2.name = tName;
         writeCbModel(cMod2, 'mat', [tName '_2']);
         if (~isSameCobraModel(cMod, cMod2))
-            fprintf('When running INIT with model %s, fig %s and cell line %s, the old and new models are different!\n', modelName, figName, cellLine);
+            fprintf('When running INIT  model %s, fig %s and cell line %s, id %d, the old and new models are different!\n', modelName, figName, cellLine, id);
         end
     catch ME
         warning('Failed to run INIT on model %s, figure %s with cell line %s', modelName, [figName num2str(id)], cellLine);

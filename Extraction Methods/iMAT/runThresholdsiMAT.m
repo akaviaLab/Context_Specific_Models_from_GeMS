@@ -132,6 +132,8 @@ function run_iMat(core, model, expressionCol, figName, epsil, lb, ub, id, modelN
     tName = ['iMAT_',figName, num2str(id),'_',modelName,'_',cellLine];
     disp(tName)
     tic
+    % The default epsilon in createTissueModel is 1, which means it works
+    % for 'S' and 'U'. It fails for 'C'
     cMod = call_iMAT(model, core, epsil, expressionCol, lb, ub, tol, [tName,'.txt'], runtime);
     toc
     cMod.name = tName;
@@ -148,7 +150,7 @@ function run_iMat(core, model, expressionCol, figName, epsil, lb, ub, id, modelN
         cMod2.name = tName;
         writeCbModel(cMod2, 'mat', [tName '_2'])
         if (~isSameCobraModel(cMod, cMod2))
-            fprintf('When running iMAT with model %s, fig %s and cell line %s, the old and new models are different!\n', modelName, figName, cellLine);
+            warning('In iMAT model %s, cell line %s, fig %s, id %d, the old and new models are different!\n', modelName, cellLine, figName, id);
         end
     catch ME
         warning('Failed to run iMAT on model %s, figure %s with cell line %s', modelName, [figName num2str(id)], cellLine);

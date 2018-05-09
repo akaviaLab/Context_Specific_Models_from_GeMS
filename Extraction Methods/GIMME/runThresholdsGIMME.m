@@ -69,8 +69,8 @@ function singleRun(model, expressionCol, ut, obj_frac, figName, id, modelName, c
         cMod2 = createTissueSpecificModel(model, optionsLocal, 1, [], paramsLocal);
         cMod2.name = tName;
         writeCbModel(cMod2, 'mat', [tName '_2']);
-        if (~isSameCobraModel(cMod2, cMod2))
-            fprintf('When running GIMME with model %s, and cell line %s, the old and new models are different!\n', modelName, cellLine);
+        if (~isSameCobraModel(cMod, cMod2))
+            warning('In GIMME model %s, cell line %s, fig %s, id %d, the old and new models are different!\n', modelName, cellLine, figName, id);
         end
     catch ME
         warning('Failed to run GIMME on model %s, figure %s with cell line %s', modelName, [figName num2str(id)], cellLine);
