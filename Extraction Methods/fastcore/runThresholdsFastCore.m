@@ -106,24 +106,13 @@ end
 function singleRun(core, expressionCol, figName, model, epsil, scaling, th, id, modelName, cellLine)
 tName = ['FastCore_',modelName, '_', figName, num2str(id),'_',cellLine];
 disp(tName)
-try 
-cMod = call_fastcore(model, expressionCol, model.rxns(core), th, epsil, scaling);
-cMod.name = tName;
-writeCbModel(cMod, 'mat', tName);
-catch ME
-    warning('Failed to run Opdam version of fastcore on model %s, figure %s with cell line %s', modelName, [figName num2str(id)], cellLine);
-    warning(ME.message)
-end
 C = find(expressionCol >= th);
 C = union(C, core);
 optionsLocal = struct('solver', 'fastCore', 'core', {C}, 'epsilon', epsil);
 try
-    cMod2 = createTissueSpecificModel(model, optionsLocal);
-    cMod2.name = tName;
-    writeCbModel(cMod2, 'mat', [tName '_2']);
-    if (~isSameCobraModel(cMod, cMod2))
-        fprintf('When running fastcore with model %s, cell line %s, fig %s, id %d, the old and new models are different!\n', modelName, figName, cellLine, id);
-    end
+    cMod = createTissueSpecificModel(model, optionsLocal);
+    cMod.name = tName;
+    writeCbModel(cMod, 'mat', [tName '_2']);
 catch ME
     warning('Failed to run fastcore on model %s, figure %s with cell line %s', modelName, [figName num2str(id)], cellLine);
     warning(ME.message)

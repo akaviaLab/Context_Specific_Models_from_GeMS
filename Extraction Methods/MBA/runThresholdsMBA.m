@@ -124,32 +124,6 @@ end
 function run_MBA(core, model, expressionCol, figName, mt, ut, id, modName, tol, cellLine)
     tName = ['MBA','_',figName, num2str(id),'_',modName];
     disp(tName)
-    %Make sure output model is consistent, if not, run again
-    paramConsistency.epsilon=tol;
-    paramConsistency.modeFlag=0;
-    paramConsistency.method='fastcc';
-    
-    incon = true;
-    nrun = 0;
-    % MBA function runs until there are no inconsistent reactions, without
-    % limitations on nmber of runs. Needs to be clarified
-    while incon && nrun < 10
-        cMod = call_MBA(model, expressionCol, core, mt, ut, 0.5, tol);
-        
-        nrun = nrun + 1;
-        [~,~, ~, fluxInConsistentRxnBool] = findFluxConsistentSubset(cMod,paramConsistency);
-        if (sum(fluxInConsistentRxnBool) == 0)
-            incon = false;
-        end
-    end
-    if incon
-        errmsg = 'Output model is inconsistent';
-        save(['INC_',tName,'.mat'],'errmsg')
-    end
-    disp(['Number of rxns: ',num2str(numel(cMod.rxns))])
-    cMod.name = tName;
-    writeCbModel(cMod, 'mat', tName);
-    disp(' ')
     
     indH = find(expressionCol > ut);
     indM = find(expressionCol >= mt & expressionCol <= ut);
@@ -157,16 +131,14 @@ function run_MBA(core, model, expressionCol, figName, mt, ut, id, modName, tol, 
     CM = model.rxns(indM); %#ok<FNDSB>
     NC = setdiff(model.rxns, union(CH, CM));
     %Biomass metabolite sinks are not pruned in call_MBA
-    CM = union(CM, NC(contains(NC, 'BMS_')));
+    biomassMetSinksInd = contains(NC, 'BMS_'); 
+    CM = union(CM, NC(biomassMetSinksInd));
     
     try
-        cMod2 = MBA(model, CM, CH, tol);
+        cMod = MBA(model, CM, CH, tol);
         disp(['Number of rxns: ',num2str(numel(cMod.rxns))])
-        cMod2.name = tName;
-        writeCbModel(cMod2, 'mat', [tName '_2']);
-        if (~isSameCobraModel(cMod, cMod2))
-            fprintf('When running MBA model %s, cell line %s, fig %s, id %d, the old and new models are different!\n', modelName, cellLine, figName, id);
-        end
+        cMod.name = tName;
+        writeCbModel(cMod, 'mat', [tName '_2']);
     catch ME
         warning('Failed to run MBA on model %s, figure %s with cell line %s', modelName, [figName num2str(id)], cellLine);
         warning(ME.message)

@@ -79,7 +79,9 @@ function A = fastcc( model, epsilon )
     %tic
 
     N = (1:numel(model.rxns));
-    I = find(model.rev==0);
+    I = find(model.rev == 0);
+    %I = find(model.lb>=0); %this is the toolbox line (as of 9-May-2018),
+    %and it leads to different results from the Opdam version.
 
     A = [];
 

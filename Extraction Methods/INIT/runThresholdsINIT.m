@@ -160,13 +160,8 @@ end
 function run_INIT(model, ~, figName, epsil, w, id, modelName, tol, runtime, cellLine)
     tName = ['INIT_',figName, num2str(id),'_',modelName,'_',cellLine];
     disp(tName)
-    % The default epsilon in createTissueModel is 1, which means it works
-    % for 'S' and 'U'. It fails for 'C'
-    cMod = call_INIT(model, epsil, w, tol, [tName,'.txt'], runtime);
-    cMod.name = tName;
-    writeCbModel(cMod, 'mat', tName);
     optionsLocal = struct('weights', {w}, 'tol', tol, 'runtime', runtime', ...
-        'solver', 'INIT', 'logfile', [tName,'.txt']);
+        'epsilon', epsil, 'solver', 'INIT', 'logfile', [tName,'.txt']);
     paramConsistency.epsilon=tol;
     paramConsistency.modeFlag=0;
     paramConsistency.method='fastcc';

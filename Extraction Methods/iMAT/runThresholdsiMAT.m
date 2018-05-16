@@ -30,6 +30,7 @@ if strcmp(figName,'U')
     tol = 1e-6;
     core = {};
     runtime = 3600;
+        epsil = 1;
     if strcmp(bb,'B')
         biomassRxnInd = strcmpi(model_u.rxns, 'biomass_reaction');
         biomassRxn = model_u.rxns(biomassRxnInd);
@@ -43,7 +44,6 @@ if strcmp(figName,'U')
         figName = [figName,'F'];
     end
     expressionCol = mapExpressionToReactions(model_u, expressionData_u);
-    epsil = 1;
     run_iMat(core, model_u, expressionCol, figName, epsil, ths.p10, ths.p10, 1, modelName, tol, runtime, cellLine)
     run_iMat(core, model_u, expressionCol, figName, epsil, ths.mean, ths.mean, 2, modelName, tol, runtime, cellLine)
     run_iMat(core, model_u, expressionCol, figName, epsil, ths.p25, ths.p25, 3, modelName, tol, runtime, cellLine)
@@ -61,6 +61,7 @@ if strcmp(figName,'C')
     %CONSTRAINED
     core = {};
     runtime = 7200;
+        epsil = 1e-6;
     if strcmp(bb,'B')
         biomassRxnInd = strcmpi(model_c.rxns, 'biomass_reaction');
         biomassRxn = model_c.rxns(biomassRxnInd);
@@ -82,7 +83,6 @@ if strcmp(figName,'C')
         figName = [figName,'H'];
     end
     expressionCol = mapExpressionToReactions(model_c, expressionData_c);
-    epsil = 1e-6;
     run_iMat(core, model_c, expressionCol, figName, epsil, ths.p10, ths.p10, 1, modelName, tol, runtime, cellLine)
     run_iMat(core, model_c, expressionCol, figName, epsil, ths.mean, ths.mean, 2, modelName, tol, runtime, cellLine)
     run_iMat(core, model_c, expressionCol, figName, epsil, ths.p25, ths.p25, 3, modelName, tol, runtime, cellLine)
@@ -100,6 +100,7 @@ if strcmp(figName,'S')
     tol = 1e-6;
     core = {};
     runtime = 3600;
+        epsil = 1;
     if strcmp(bb,'B')
         biomassRxnInd = strcmpi(model_s.rxns, 'biomass_reaction');
         biomassRxn = model_s.rxns(biomassRxnInd);
@@ -113,7 +114,6 @@ if strcmp(figName,'S')
         figName = [figName,'F'];
     end
     expressionCol = mapExpressionToReactions(model_s, expressionData_s);
-    epsil = 1;
     run_iMat(core, model_s, expressionCol, figName, epsil, ths.p10, ths.p10, 1, modelName, tol, runtime, cellLine)
     run_iMat(core, model_s, expressionCol, figName, epsil, ths.mean, ths.mean, 2, modelName, tol, runtime, cellLine)
     run_iMat(core, model_s, expressionCol, figName, epsil, ths.p25, ths.p25, 3, modelName, tol, runtime, cellLine)
@@ -131,27 +131,17 @@ end
 function run_iMat(core, model, expressionCol, figName, epsil, lb, ub, id, modelName, tol, runtime, cellLine)
     tName = ['iMAT_',figName, num2str(id),'_',modelName,'_',cellLine];
     disp(tName)
-    tic
-    % The default epsilon in createTissueModel is 1, which means it works
-    % for 'S' and 'U'. It fails for 'C'
-    cMod = call_iMAT(model, core, epsil, expressionCol, lb, ub, tol, [tName,'.txt'], runtime);
-    toc
-    cMod.name = tName;
-    writeCbModel(cMod, 'mat', tName)
     paramConsistency.epsilon=tol;
     paramConsistency.modeFlag=0;
     paramConsistency.method='fastcc';
-    optionsLocal = struct('solver', 'iMAT', 'expressionRxns', {expressionCol}, 'threshold_lb', lb, ...
+    optionsLocal = struct('solver', 'iMAT', 'expressionRxns', {expressionCol}, 'threshold_lb', lb, 'epsilon', epsil,...
         'threshold_ub', ub, 'tol', tol, 'core', {core}, 'logfile', [tName,'_2.txt'], 'runtime', runtime);
     try
         tic
         cMod2 = createTissueSpecificModel(model, optionsLocal, 1, [], paramConsistency);
         toc
         cMod2.name = tName;
-        writeCbModel(cMod2, 'mat', [tName '_2'])
-        if (~isSameCobraModel(cMod, cMod2))
-            warning('In iMAT model %s, cell line %s, fig %s, id %d, the old and new models are different!\n', modelName, cellLine, figName, id);
-        end
+        writeCbModel(cMod2, 'mat', tName)
     catch ME
         warning('Failed to run iMAT on model %s, figure %s with cell line %s', modelName, [figName num2str(id)], cellLine);
         warning(ME.message)

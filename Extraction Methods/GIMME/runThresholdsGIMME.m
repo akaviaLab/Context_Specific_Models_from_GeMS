@@ -60,18 +60,13 @@ function singleRun(model, expressionCol, ut, obj_frac, figName, id, modelName, c
     tName = ['GIMME_',modelName, '_', figName, num2str(id),'_',cellLine];
     disp(tName)
     disp('RUNNING GIMME...')
-    cMod= call_GIMME(model, expressionCol, ut, obj_frac, tol);
-    writeCbModel(cMod, 'mat', tName);
     optionsLocal = struct('solver', 'GIMME', 'expressionRxns', {expressionCol},...
         'threshold', ut, 'obj_frac', obj_frac);
     paramsLocal.epsilon = tol;
     try
-        cMod2 = createTissueSpecificModel(model, optionsLocal, 1, [], paramsLocal);
-        cMod2.name = tName;
-        writeCbModel(cMod2, 'mat', [tName '_2']);
-        if (~isSameCobraModel(cMod, cMod2))
-            warning('In GIMME model %s, cell line %s, fig %s, id %d, the old and new models are different!\n', modelName, cellLine, figName, id);
-        end
+        cMod = createTissueSpecificModel(model, optionsLocal, 1, [], paramsLocal);
+        cMod.name = tName;
+        writeCbModel(cMod, 'mat', [tName '_2']);
     catch ME
         warning('Failed to run GIMME on model %s, figure %s with cell line %s', modelName, [figName num2str(id)], cellLine);
         warning(ME.message)

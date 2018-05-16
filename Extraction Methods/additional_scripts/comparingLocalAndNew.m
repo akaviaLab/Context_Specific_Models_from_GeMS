@@ -8,7 +8,8 @@
 % FASTCORE - ??
 % INIT & iMAT - the default epsilon in createTissueModel works for U and S,
 % not for C. Need to consider adding epsilon as an option.
-% MBA is massively different, need to check why
+% MBA is massively different, need to check why - fastcc in Opdam is old
+% and probably wrong
 % mCADRE in Opdam is weird, since it has hardcoded checkprecursor
 % metaoblites, using the toolbox for all future work
 
