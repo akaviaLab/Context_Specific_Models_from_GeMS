@@ -138,7 +138,7 @@ function run_MBA(core, model, expressionCol, figName, mt, ut, id, modName, tol, 
         cMod = MBA(model, CM, CH, tol);
         disp(['Number of rxns: ',num2str(numel(cMod.rxns))])
         cMod.name = tName;
-        writeCbModel(cMod, 'mat', [tName '_2']);
+        writeCbModel(cMod, 'mat', tName);
     catch ME
         warning('Failed to run MBA on model %s, figure %s with cell line %s', modelName, [figName num2str(id)], cellLine);
         warning(ME.message)

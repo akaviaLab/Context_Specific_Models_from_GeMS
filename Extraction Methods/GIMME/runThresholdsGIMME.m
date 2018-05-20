@@ -66,7 +66,7 @@ function singleRun(model, expressionCol, ut, obj_frac, figName, id, modelName, c
     try
         cMod = createTissueSpecificModel(model, optionsLocal, 1, [], paramsLocal);
         cMod.name = tName;
-        writeCbModel(cMod, 'mat', [tName '_2']);
+        writeCbModel(cMod, 'mat', tName);
     catch ME
         warning('Failed to run GIMME on model %s, figure %s with cell line %s', modelName, [figName num2str(id)], cellLine);
         warning(ME.message)

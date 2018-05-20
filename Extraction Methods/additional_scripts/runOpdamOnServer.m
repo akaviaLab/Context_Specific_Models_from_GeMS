@@ -9,19 +9,23 @@ pc.JobStorageLocation = strcat('/localscratch/', getenv('PBS_JOBID')); % Which d
 nworkers = str2double(getenv('PBS_NUM_PPN'));
 parpool(pc, nworkerst) % starts the parallel pool
 
+numberModels = 4;
+
 switch extractionMethod
-    case 'iMAT'
-        runThresholdsiMAT(figName, bbLetter, modelName, cellLine);
     case 'GIMME'
         runThresholdsGIMME(figName, modelName, cellLine);
+    case 'fastcore'
+        runThresholdsFastCore(figName, bbLetter, modelName, cellLine);
+    case 'iMAT'
+        runThresholdsiMAT(figName, bbLetter, modelName, cellLine);
+        numberModels = 10;
     case 'INIT'
         runThresholdsINIT(figName, bbLetter, modelName, cellLine);
     case 'MBA'
         runThresholdsMBA(figName, bbLetter, modelName, cellLine);
+        numberModels = 10;
     case 'mCADRE'
         runThresholdsmCADRE(figName, bbLetter, modelName, cellLine);
-    case 'fastcore'
-        runThresholdsFastCore(figName, bbLetter, modelName, cellLine);
 end
 
 end

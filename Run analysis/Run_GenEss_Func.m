@@ -1,68 +1,73 @@
-
-function [GenEss_score,Func_score] = Run_GenEss_Func(contextSpecificModelName,CellLine, constrainedModelFile)
+function [mEssGenes, mNonGenes, GenEss_score,Func_score] = Run_GenEss_Func(contextSpecificModelName,CellLine, constrainedModelFile)
 %Run_GenEss_Func Performs analysis for Gene essentiality and Metabolic
 %capabilities
-    %linearMOMA
-    %
-    % [GenEss_score,Func_score] = Run_GenEss_Func(model,CellLine,savefile)
-    %
-    %INPUT
-    % contextSpecificModelName  COBRA model structure of the extracted context-specific
-    %                           model
-    % CellLine                  Cell Line of the extracted context-specific model
-    %                           (A375, HL60, KBM7 or K562)
-    % constrainedModelFile      Filename containing the model_u constrained
-    %                           for this cell line
-    %
-    %OUTPUTS
-    % GenEss_score              Computed Gene Essentiality score
-    % Func_score                Functionality score (pourcentage of capabilities
-    %                           recovered by the context-specific model)
+%linearMOMA
+%
+% [GenEss_score,Func_score] = Run_GenEss_Func(model,CellLine,savefile)
+%
+%INPUT
+% contextSpecificModelName  COBRA model structure of the extracted context-specific
+%                           model
+% CellLine                  Cell Line of the extracted context-specific model
+%                           (A375, HL60, KBM7 or K562)
+% constrainedModelFile      Filename containing the model_u constrained
+%                           for this cell line
+%
+%OUTPUTS
+% mEssP                     Copmuted Essential genes
+% mNonP                     Computed Non essential genes
+% GenEss_score              Computed Gene Essentiality score
+% Func_score                Functionality score (pourcentage of capabilities
+%                           recovered by the context-specific model)
 
+%% Load the context-specific model to analyze
+tmB = readCbModel(contextSpecificModelName);
 
-global  depl_p 
-    
-    if (nargin < 3)
-        load(['model_u_',CellLine,'.mat']);
-        load(['gene_expr_u_',CellLine,'.mat']);
-        load(['gene_id_u_',CellLine,'.mat']);
-    else
-        load(constrainedModelFile, 'model_u');
-    end
+%% load gene essentiality from in vitro screen
+global  depl_p
+
+if (nargin < 3)
+    load(['model_u_',CellLine,'.mat']);
+    load(['gene_expr_u_',CellLine,'.mat']);
+    load(['gene_id_u_',CellLine,'.mat']);
     depl_p = findModelDepletionGenes_loc(model_u,['depletion_ratios_',CellLine,'.xls']);
+else
+    depl_p = findModelDepletionGenes_loc(tmB,['depletion_ratios_',CellLine,'.xls']);
+end
+%% Check gene-essentiality
+% Growth rate for essential genes after KO is at most 0.01 of WT -
+% TODO should rate be different?
+maxgr=0.01;
+tmBcRed = tmB;
+%TODO - think about if lower bound for biomass should be zero
+tmBcRed = changeRxnBounds(tmBcRed,tmBcRed.rxns(tmBcRed.c == 1),0,'l');
+% See if it can use toolbox version
+grRatios = singleGeneDeletion(tmBcRed,'FBA',depl_p.genes);
 
+essentialGemeInd = grRatios <= maxgr;
+nonEssentialGemeInd = grRatios > maxgr;
+mEssP = depl_p.values(essentialGemeInd);
+mNonP = depl_p.values(nonEssentialGemeInd);
 
-        %% Load the context-specific model to analyze
-        tmB = readCbModel([contextSpecificModelName,'.mat']);
-%         tmB = load([contextSpecificModelName,'.mat']);
-%         tmB = eval(contextSpecificModelName);
-%         eval(['clear ',contextSpecificModelName]);
-  
-        %% Check gene-essentiality
-        % Growth rate for essential genes after KO is at most 0.01 of WT
-        maxgr=0.01;
-        tmBcRed = tmB;
-        %TODO - think about if lower bound for biomass should be zero
-        tmBcRed = changeRxnBounds(tmBcRed,tmBcRed.rxns(tmBcRed.c == 1),0,'l');
-        % See if it can use toolbox version
-        grRatios = singleGeneDeletion_loc(tmBcRed,'FBA',depl_p.genes);
-    
-        mEssP = depl_p.values(grRatios <= maxgr);
-        mNonP = depl_p.values(grRatios > maxgr);
-        
-        GenEss_score = ranksum(mEssP,mNonP,'tail','left');
-        % Not really clear what testFunctionality is trying to do. Should
-        % probably read original paper
-        [totTest, numTests] = testFunctionality(tmB);
-        Func_score=totTest/numTests*100;
-        
+mEssGenes = depl_p.genes(essentialGemeInd);
+mNonGenes = depl_p.genes(nonEssentialGemeInd);
+
+GenEss_score = ranksum(mEssP,mNonP,'tail','left');
+% Not really clear what testFunctionality is trying to do. Should
+% probably read original paper
+[totTest, numTests] = testFunctionality(tmB);
+Func_score=totTest/numTests*100;
 end
 
 function [totTest, numTests] = testFunctionality(model)
     [~,bmMets,~] = xlsread('biomass_rxn.xls');
     bmMets = setdiff(bmMets,{'atp[c]','adp[c]','pi[c]','h2o[c]','h[c]'});
     numTests = numel(bmMets) + 1;
-    comp = {'[c]','[e]','[g]','[l]','[m]','[n]','[r]','[x]'};
+    if (isfield(model, 'comps'))
+        comp = strcat('[', model.comps, ']');
+    else
+        comp = {'[c]','[e]','[g]','[l]','[m]','[n]','[r]','[x]'}; % if model doesn't have compartments
+    end
     totTest = 0;
     for i = 1:numel(bmMets)
         cMet = bmMets{i}(1:end-3);
@@ -73,7 +78,7 @@ function [totTest, numTests] = testFunctionality(model)
                 nm = addReaction(model,['BMS_',met],{met},-0.5,false,0,1000,0,'Biomass Metabolite Sink');
                 nm = changeObjective(nm, ['BMS_',met]);
                 sol = optimizeCbModel(nm);
-                if sol.f > 1e-8;
+                if sol.f > 1e-8
                     cTest = 1;
                     break;
                 end
@@ -88,7 +93,7 @@ function [totTest, numTests] = testFunctionality(model)
     warning on all
     nm = changeObjective(nm, 'BMS_atp(c)');
     sol = optimizeCbModel(nm);
-    if sol.f > 1e-8;
+    if sol.f > 1e-8
         totTest = totTest + 1;
     end
     
@@ -96,188 +101,11 @@ function [totTest, numTests] = testFunctionality(model)
 end
 
 %%
-function [grRatio,grRateKO,grRateWT,hasEffect,delRxns,fluxSolution] = singleGeneDeletion_loc(model,method,geneList,verbFlag)
-%singleGeneDeletion Performs single gene deletion analysis using FBA, MOMA or
-    %linearMOMA
-    %
-    % [grRatio,grRateKO,grRateWT,delRxns,hasEffect] = singleGeneDeletion(model,method,geneList,verbFlag)
-    %
-    %INPUT
-    % model         COBRA model structure including gene-reaction associations
-    %
-    %OPTIONAL INPUT
-    % method        Either 'FBA', 'MOMA', or 'lMOMA' (Default = 'FBA')
-    % geneList      List of genes to be deleted (default = all genes)
-    % verbFlag      Verbose output (Default false)
-    %
-    %OUTPUTS
-    % grRatio       Computed growth rate ratio between deletion strain and wild type
-    % grRateKO      Deletion strain growth rates (1/h)
-    % grRateWT      Wild type growth rate (1/h)
-    % hasEffect     Does a gene deletion affect anything (i.e. are any reactions
-    %               removed from the model)
-    % delRxns       List of deleted reactions for each gene KO
-    % fluxSolution  FBA/MOMA/lMOMA fluxes for KO strains
-    %
-    % Markus Herrgard 8/7/06
-
-    if (nargin < 2)
-        method = 'FBA';
-    end
-    if (nargin < 3)
-        geneList = model.genes;
-    else
-        if (isempty(geneList))
-            geneList = model.genes;
-        end
-    end
-    if (nargin < 4)
-        verbFlag = false;
-    end
-
-    nGenes = length(model.genes);
-    nDelGenes = length(geneList);
-    solWT = optimizeCbModel(model); 
-    grRateWT = solWT.f;
-
-    if grRateWT <= 1e-2 
-        warning('Very small GR')
-    end
-
-    grRateKO = ones(nDelGenes,1)*grRateWT;
-    grRatio = ones(nDelGenes,1); 
-    hasEffect = true(nDelGenes,1);
-    fluxSolution = zeros(length(model.rxns),nDelGenes);
-    delRxns = cell(nDelGenes,1);
-    if (verbFlag)  
-        fprintf('%4s\t%4s\t%10s\t%9s\t%9s\n','No','Perc','Name','Growth rate','Rel. GR');
-    end
-
-    for i = 1:nDelGenes
-        if any(ismember(model.genes,geneList{i}))
-            [modelDel,hasEffect(i),constrRxnNames] = deleteModelGenes(model,geneList{i}); 
-            delRxns{i} = constrRxnNames;
-        else
-            delRxns{i} = {};
-            hasEffect(i) = false;
-        end
-        if (hasEffect(i))
-            switch method
-                case 'lMOMA'
-                    solKO = linearMOMA(model,modelDel,'max');
-                case 'MOMA'
-                    solKO = MOMA_loc(model,modelDel,'max',false,true);
-                otherwise
-                    solKO = optimizeCbModel(modelDel,'max');
-            end
-            if (solKO.stat == 1)
-                grRateKO(i) = solKO.f;
-                fluxSolution(:,i) = solKO.x;
-            else
-                grRateKO(i) = NaN;
-            end
-        end
-        if (verbFlag)
-            fprintf('%4d\t%4.0f\t%10s\t%9.3f\t%9.3f\n',i,100*i/nDelGenes,geneList{i},grRateKO(i),grRateKO(i)/grRateWT*100);
-        end
-    end
-
-    grRatio = grRateKO/grRateWT;
-    grRatio(isnan(grRatio)) = 0; 
-
-end
-
-%%
-function model = changeRxnBounds_loc(model,rxnNameList,value,boundType)
-%changeRxnBounds Change upper or lower bounds of a reaction or a set of
-%reactions
-%
-% model = changeRxnBounds(model,rxnNameList,value,boundType)
-%
-%INPUTS
-% model         COBRA model structure
-% rxnNameList   List of reactions (cell array or string)
-% value         Bound values
-%               Can either be a vector or a single scalar value if the same
-%               bound value is to be assinged to all reactions
-%
-%OPTIONAL INPUT
-% boundType     'u' - upper, 'l' - lower, 'b' - both (Default = 'b')
-%               Bound type can either be a cell array of strings or a 
-%               string with as many letters as there are reactions in 
-%               rxnNameList
-%
-%OUTPUT
-% model         COBRA model structure with modified reaction bounds
-%
-% Markus Herrgard 4/21/06
-
-if (nargin < 4)
-    boundType = 'b';
-end
-
-if ((length(value) ~= length(rxnNameList) && length(value) > 1) || (length(boundType) ~= length(rxnNameList) && length(boundType) > 1))
-   error('Inconsistent lenghts of arguments: rxnNameList, value & boundType'); 
-end
-
-rxnID = findRxnIDs(model,rxnNameList);
-
-% Remove reactions that are not in the model
-if (iscell(rxnNameList))
-    missingRxns = rxnNameList(rxnID == 0);
-    for i = 1:length(missingRxns)
-        fprintf('Reaction %s not in model\n',missingRxns{i}); 
-    end
-    if (length(boundType) > 1)
-        boundType = boundType(rxnID ~= 0);
-    end
-    if (length(value) > 1)
-        value = value(rxnID ~= 0);
-    end
-    rxnID = rxnID(rxnID ~= 0);    
-end
-
-if (isempty(rxnID) || sum(rxnID) == 0)
-    display('No such reaction in model');
-else
-    nRxns = length(rxnID);
-    if (length(boundType) > 1)
-        if (length(value) == 1)
-            value = repmat(value,nRxns,1);
-        end
-        for i = 1:nRxns
-            switch lower(boundType{i})
-                case 'u'
-                    model.ub(rxnID(i)) = value(i);
-                case 'l'
-                    model.lb(rxnID) = value(i);
-                case 'b'
-                    model.lb(rxnID) = value(i);
-                    model.ub(rxnID) = value(i);
-            end
-        end
-    else
-        switch lower(boundType)
-            case 'u'
-                model.ub(rxnID) = value;
-            case 'l'
-                model.lb(rxnID) = value;
-            case 'b'
-                model.lb(rxnID) = value;
-                model.ub(rxnID) = value;
-        end
-    end
-end
-end
-
 function genes_ratios = findModelDepletionGenes_loc(model,filename)
 
     % Load depletion (CRISPR) and ID data
     [~,~,raw] = xlsread(filename);
     fid = fopen('gecko_id_to_entrez.txt', 'r'); % TODO - THis file was done in XLS, and screwed up several gene names. Can probably be replaced by processing gene_info, or some newer version from the GECKO website.
-    % TODO - there are areathrough genes - can CRISPR/GECKO really disrupt
-    % them and only them? Maybe not important because they're not in the
-    % model?
     % TODO - use the CERES correction of Gecko, but not at first
     % https://figshare.com/articles/CERES_-_Meyers_Bryan_et_al_Nature_Genetics_2017_/5319388
     foo = textscan(fid, '%s %s');

@@ -104,7 +104,7 @@ end
 end
 
 function singleRun(core, expressionCol, figName, model, epsil, scaling, th, id, modelName, cellLine)
-tName = ['FastCore_',modelName, '_', figName, num2str(id),'_',cellLine];
+tName = ['fastcore_',modelName, '_', figName, num2str(id),'_',cellLine];
 disp(tName)
 C = find(expressionCol >= th);
 C = union(C, core);
@@ -112,7 +112,7 @@ optionsLocal = struct('solver', 'fastCore', 'core', {C}, 'epsilon', epsil);
 try
     cMod = createTissueSpecificModel(model, optionsLocal);
     cMod.name = tName;
-    writeCbModel(cMod, 'mat', [tName '_2']);
+    writeCbModel(cMod, 'mat', tName);
 catch ME
     warning('Failed to run fastcore on model %s, figure %s with cell line %s', modelName, [figName num2str(id)], cellLine);
     warning(ME.message)
