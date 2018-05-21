@@ -7,7 +7,7 @@ initCobraToolbox;
 pc = parcluster('local');
 pc.JobStorageLocation = strcat('/localscratch/', getenv('PBS_JOBID')); % Which directory are the threads using to communicate
 nworkers = str2double(getenv('PBS_NUM_PPN'));
-parpool(pc, nworkerst) % starts the parallel pool
+parpool(pc, nworkers) % starts the parallel pool
 
 numberModels = 4;
 
