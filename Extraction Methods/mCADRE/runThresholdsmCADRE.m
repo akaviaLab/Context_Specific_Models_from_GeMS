@@ -1,4 +1,9 @@
-function runThresholdsmCADRE(figName, bb, modelName, cellLine)
+function runThresholdsmCADRE(figName, bb, modelName, cellLine, overWrite)
+
+if (nargin < 5 || isempty(overWrite))
+    overWrite = true;
+end
+
 %initCobraToolbox
 load(['ID_FPKM_', cellLine, '.mat'], 'num');
 load(['growthRate_',cellLine,'.mat'], 'blb')
@@ -43,10 +48,10 @@ expressionData_s.value(1:length(indNum)) = num(indNum, 2);
         end
         disp('UNCONSTRAINED MODEL')
         expressionCol_u = mapExpressionToReactions(model_u, expressionData_u);
-        singleRun(core, model_u,  ths.p10, 1, 1/3, figName, 1, modelName, tol, expressionCol_u, cellLine)
-        singleRun(core, model_u,  ths.mean, 1, 1/3, figName, 2, modelName, tol, expressionCol_u, cellLine)
-        singleRun(core, model_u,  ths.p25, 1, 1/3, figName, 3, modelName, tol, expressionCol_u, cellLine)
-        singleRun(core, model_u,  ths.p50, 1, 1/3, figName, 4, modelName, tol, expressionCol_u, cellLine)
+        singleRun(core, model_u,  ths.p10, 1, 1/3, figName, 1, modelName, tol, expressionCol_u, cellLine, overWrite)
+        singleRun(core, model_u,  ths.mean, 1, 1/3, figName, 2, modelName, tol, expressionCol_u, cellLine, overWrite)
+        singleRun(core, model_u,  ths.p25, 1, 1/3, figName, 3, modelName, tol, expressionCol_u, cellLine, overWrite)
+        singleRun(core, model_u,  ths.p50, 1, 1/3, figName, 4, modelName, tol, expressionCol_u, cellLine, overWrite)
     end
     if strcmp(figName,'C')
         tol = 1e-8;
@@ -75,10 +80,10 @@ expressionData_s.value(1:length(indNum)) = num(indNum, 2);
             figName = [figName,'H'];
         end
         expressionCol_c = mapExpressionToReactions(model_c, expressionData_c);
-        singleRun(core, model_c, ths.p10, 1, 1/3, figName, 1, modelName, tol, expressionCol_c, cellLine)
-        singleRun(core, model_c, ths.mean, 1, 1/3, figName, 2, modelName, tol, expressionCol_c, cellLine)
-        singleRun(core, model_c, ths.p25, 1, 1/3, figName, 3, modelName, tol, expressionCol_c, cellLine)
-        singleRun(core, model_c, ths.p50, 1, 1/2, figName, 4, modelName, tol, expressionCol_c, cellLine)
+        singleRun(core, model_c, ths.p10, 1, 1/3, figName, 1, modelName, tol, expressionCol_c, cellLine, overWrite)
+        singleRun(core, model_c, ths.mean, 1, 1/3, figName, 2, modelName, tol, expressionCol_c, cellLine, overWrite)
+        singleRun(core, model_c, ths.p25, 1, 1/3, figName, 3, modelName, tol, expressionCol_c, cellLine, overWrite)
+        singleRun(core, model_c, ths.p50, 1, 1/2, figName, 4, modelName, tol, expressionCol_c, cellLine, overWrite)
     end
     if strcmp(figName,'S')
         tol = 1e-6;
@@ -99,15 +104,14 @@ expressionData_s.value(1:length(indNum)) = num(indNum, 2);
         end
         disp('SEMI-CONSTRAINED MODEL')
         expressionCol_s = mapExpressionToReactions(model_s, expressionData_s);
-        singleRun(core, model_s, ths.p10, 1, 1/3, figName, 1, modelName, tol, expressionCol_s, cellLine)
-        singleRun(core, model_s, ths.mean, 1, 1/3, figName, 2, modelName, tol, expressionCol_s, cellLine)
-        singleRun(core, model_s, ths.p25, 1, 1/3, figName, 3, modelName, tol, expressionCol_s, cellLine)
-        singleRun(core, model_s, ths.p50, 1, 1/3, figName, 4, modelName, tol, expressionCol_s, cellLine)
+        singleRun(core, model_s, ths.p10, 1, 1/3, figName, 1, modelName, tol, expressionCol_s, cellLine, overWrite)
+        singleRun(core, model_s, ths.mean, 1, 1/3, figName, 2, modelName, tol, expressionCol_s, cellLine, overWrite)
+        singleRun(core, model_s, ths.p25, 1, 1/3, figName, 3, modelName, tol, expressionCol_s, cellLine, overWrite)
+        singleRun(core, model_s, ths.p50, 1, 1/3, figName, 4, modelName, tol, expressionCol_s, cellLine, overWrite)
     end
-    exit;
 end
 
-function singleRun(core, model, ht, mcheck, eta, figName, id, modelName, tol, expressionCol, cellLine)
+function singleRun(core, model, ht, mcheck, eta, figName, id, modelName, tol, expressionCol, cellLine, overWrite)
     tName = ['mCADRE_',modelName, '_', cellLine, '_', figName, num2str(id)];
     disp(tName)
     disp('RUNNING mCADRE...')
@@ -115,7 +119,7 @@ function singleRun(core, model, ht, mcheck, eta, figName, id, modelName, tol, ex
     if (any(ismember(fieldnames(model), 'confidenceScores')))
         confidenceScores = str2double(model.confidenceScores);
     else
-        confidenceScores = str2double(model.rxnConfidenceScores);
+        confidenceScores = model.rxnConfidenceScores;
     end
     confidenceScores(isnan(confidenceScores)) = 0;
     expressionCol = expressionCol / ht;
@@ -129,12 +133,17 @@ function singleRun(core, model, ht, mcheck, eta, figName, id, modelName, tol, ex
     if (isempty(modelName))   % Recon1 can't produce the metabolites for the protected reaction
         optionsLocal.checkFunctionality = 0;
     end
-    try
-        cMod = createTissueSpecificModel(model, optionsLocal); % consistency check not required, because mCADRE seems to run it on its own
-        cMod.name = tName;
-        writeCbModel(cMod, 'mat', tName);
-    catch ME
-        warning('Failed to run mCADRE on model %s, figure %s with cell line %s', modelName, [figName num2str(id)], cellLine);
-        warning(ME.message)
+    if (~overWrite && exist([pwd '/' tName '.mat'], 'file') ~=2)
+        overWrite = 1;
+    end
+    if (overWrite)
+        try
+            cMod = createTissueSpecificModel(model, optionsLocal); % consistency check not required, because mCADRE seems to run it on its own
+            cMod.name = tName;
+            writeCbModel(cMod, 'mat', tName);
+        catch ME
+            warning('Failed to run mCADRE on model %s, figure %s with cell line %s', modelName, [figName num2str(id)], cellLine);
+            warning(ME.message)
+        end
     end
 end

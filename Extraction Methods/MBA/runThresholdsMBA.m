@@ -1,4 +1,9 @@
-function runThresholdsMBA(figName, bb, modelName, cellLine)
+function runThresholdsMBA(figName, bb, modelName, cellLine, overWrite)
+
+if (nargin < 5 || isempty(overWrite))
+    overWrite = true;
+end
+
 %initCobraToolbox
 load(['ID_FPKM_', cellLine, '.mat'], 'num');
 load(['growthRate_',cellLine,'.mat'], 'blb')
@@ -30,11 +35,11 @@ if strcmp(figName,'U')
     tol = 1e-6;
     core = {};
     if strcmp(bb, 'B')
-        biomassRxnInd = strcmpi(model_u.rxns, 'biomass_reaction');
+        biomassRxnInd = strncmpi(model_u.rxns, 'biomass', 7);
         biomassRxn = model_u.rxns(biomassRxnInd);
-        atpDM = model_u.rxns(strncmp(model_u.rxns, 'DM_atp', 6) | strcmp(model_u.rxns, 'ATPM'));
+        atpDMInd = strncmp(model_u.rxns, 'DM_atp', 6) | strcmp(model_u.rxns, 'ATPM');
         model_u = changeRxnBounds(model_u, biomassRxn, blb, 'l'); %Force biomass and ATP demand to be active
-        core = [biomassRxn, atpDM];
+        core = model_u.rxns(biomassRxnInd | atpDMInd);
         figName = [figName,'B'];
     end
     if strcmp(bb, 'F')
@@ -42,16 +47,16 @@ if strcmp(figName,'U')
         figName = [figName,'F'];
     end
     expressionCol_u = mapExpressionToReactions(model_u, expressionData_u);
-    run_MBA(core, model_u, expressionCol_u, figName, ths.p10, ths.p10, 1, modelName, tol, cellLine)
-    run_MBA(core, model_u, expressionCol_u, figName, ths.mean, ths.mean, 2, modelName, tol, cellLine)
-    run_MBA(core, model_u, expressionCol_u, figName, ths.p25, ths.p25, 3, modelName, tol, cellLine)
-    run_MBA(core, model_u, expressionCol_u, figName, ths.p50, ths.p50, 4, modelName, tol, cellLine)
-    run_MBA(core, model_u, expressionCol_u, figName, ths.mean, ths.p10, 5, modelName, tol, cellLine)
-    run_MBA(core, model_u, expressionCol_u, figName, ths.p25, ths.p10, 6, modelName, tol, cellLine)
-    run_MBA(core, model_u, expressionCol_u, figName, ths.p50, ths.p10, 7, modelName, tol, cellLine)
-    run_MBA(core, model_u, expressionCol_u, figName, ths.p25, ths.mean, 8, modelName, tol, cellLine)
-    run_MBA(core, model_u, expressionCol_u, figName, ths.p50, ths.mean, 9, modelName, tol, cellLine)
-    run_MBA(core, model_u, expressionCol_u, figName, ths.p50, ths.p25, 10, modelName, tol, cellLine)
+    run_MBA(core, model_u, expressionCol_u, figName, ths.p10, ths.p10, 1, modelName, tol, cellLine, overWrite)
+    run_MBA(core, model_u, expressionCol_u, figName, ths.mean, ths.mean, 2, modelName, tol, cellLine, overWrite)
+    run_MBA(core, model_u, expressionCol_u, figName, ths.p25, ths.p25, 3, modelName, tol, cellLine, overWrite)
+    run_MBA(core, model_u, expressionCol_u, figName, ths.p50, ths.p50, 4, modelName, tol, cellLine, overWrite)
+    run_MBA(core, model_u, expressionCol_u, figName, ths.mean, ths.p10, 5, modelName, tol, cellLine, overWrite)
+    run_MBA(core, model_u, expressionCol_u, figName, ths.p25, ths.p10, 6, modelName, tol, cellLine, overWrite)
+    run_MBA(core, model_u, expressionCol_u, figName, ths.p50, ths.p10, 7, modelName, tol, cellLine, overWrite)
+    run_MBA(core, model_u, expressionCol_u, figName, ths.p25, ths.mean, 8, modelName, tol, cellLine, overWrite)
+    run_MBA(core, model_u, expressionCol_u, figName, ths.p50, ths.mean, 9, modelName, tol, cellLine, overWrite)
+    run_MBA(core, model_u, expressionCol_u, figName, ths.p50, ths.p25, 10, modelName, tol, cellLine, overWrite)
 end
 
 if strcmp(figName,'C')
@@ -59,11 +64,11 @@ if strcmp(figName,'C')
     tol = 1e-8;
     core = {};
     if strcmp(bb, 'B')
-        biomassRxnInd = strcmpi(model_c.rxns, 'biomass_reaction');
+        biomassRxnInd = strncmpi(model_c.rxns, 'biomass', 7);
         biomassRxn = model_c.rxns(biomassRxnInd);
-        atpDM = model_c.rxns(strncmp(model_c.rxns, 'DM_atp', 6) | strcmp(model_c.rxns, 'ATPM'));
+        atpDMInd = strncmp(model_c.rxns, 'DM_atp', 6) | strcmp(model_c.rxns, 'ATPM');
         model_c = changeRxnBounds(model_c, biomassRxn, blb, 'l'); %Force biomass and ATP demand to be active
-        core = [biomassRxn, atpDM];
+        core = model_c.rxns(biomassRxnInd | atpDMInd);
         figName = [figName,'B'];
     end
     if strcmp(bb, 'F')
@@ -71,35 +76,35 @@ if strcmp(figName,'C')
         figName = [figName,'F'];
     end
     if strcmp(bb, 'H')
-        biomassRxnInd = strcmpi(model_c.rxns, 'biomass_reaction');
+        biomassRxnInd = strncmpi(model_c.rxns, 'biomass', 7);
         biomassRxn = model_c.rxns(biomassRxnInd);
-        atpDM = model_c.rxns(strncmp(model_c.rxns, 'DM_atp', 6) | strcmp(model_c.rxns, 'ATPM'));
+        atpDMInd = strncmp(model_c.rxns, 'DM_atp', 6) | strcmp(model_c.rxns, 'ATPM');
         model_c = changeRxnBounds(model_c, biomassRxn, 1e-3, 'l'); %Force biomass and ATP demand to be active
-        core = [biomassRxn, atpDM];
+        core = model_c.rxns(biomassRxnInd | atpDMInd);
         figName = [figName,'H'];
     end
     expressionCol_c = mapExpressionToReactions(model_c, expressionData_c);
-    run_MBA(core, model_c, expressionCol_c, figName, ths.p10, ths.p10, 1, modelName, tol, cellLine)
-    run_MBA(core, model_c, expressionCol_c, figName, ths.mean, ths.mean, 2, modelName, tol, cellLine)
-    run_MBA(core, model_c, expressionCol_c, figName, ths.p25, ths.p25, 3, modelName, tol, cellLine)
-    run_MBA(core, model_c, expressionCol_c, figName, ths.p50, ths.p50, 4, modelName, tol, cellLine)
-    run_MBA(core, model_c, expressionCol_c, figName, ths.mean, ths.p10, 5, modelName, tol, cellLine)
-    run_MBA(core, model_c, expressionCol_c, figName, ths.p25, ths.p10, 6, modelName, tol, cellLine)
-    run_MBA(core, model_c, expressionCol_c, figName, ths.p50, ths.p10, 7, modelName, tol, cellLine)
-    run_MBA(core, model_c, expressionCol_c, figName, ths.p25, ths.mean, 8, modelName, tol, cellLine)
-    run_MBA(core, model_c, expressionCol_c, figName, ths.p50, ths.mean, 9, modelName, tol, cellLine)
-    run_MBA(core, model_c, expressionCol_c, figName, ths.p50, ths.p25, 10, modelName, tol, cellLine)
+    run_MBA(core, model_c, expressionCol_c, figName, ths.p10, ths.p10, 1, modelName, tol, cellLine, overWrite)
+    run_MBA(core, model_c, expressionCol_c, figName, ths.mean, ths.mean, 2, modelName, tol, cellLine, overWrite)
+    run_MBA(core, model_c, expressionCol_c, figName, ths.p25, ths.p25, 3, modelName, tol, cellLine, overWrite)
+    run_MBA(core, model_c, expressionCol_c, figName, ths.p50, ths.p50, 4, modelName, tol, cellLine, overWrite)
+    run_MBA(core, model_c, expressionCol_c, figName, ths.mean, ths.p10, 5, modelName, tol, cellLine, overWrite)
+    run_MBA(core, model_c, expressionCol_c, figName, ths.p25, ths.p10, 6, modelName, tol, cellLine, overWrite)
+    run_MBA(core, model_c, expressionCol_c, figName, ths.p50, ths.p10, 7, modelName, tol, cellLine, overWrite)
+    run_MBA(core, model_c, expressionCol_c, figName, ths.p25, ths.mean, 8, modelName, tol, cellLine, overWrite)
+    run_MBA(core, model_c, expressionCol_c, figName, ths.p50, ths.mean, 9, modelName, tol, cellLine, overWrite)
+    run_MBA(core, model_c, expressionCol_c, figName, ths.p50, ths.p25, 10, modelName, tol, cellLine, overWrite)
 end
 if strcmp(figName,'S')
     %SEMI-CONSTRAINED
     tol = 1e-6;
     core = {};
     if strcmp(bb, 'B')
-        biomassRxnInd = strcmpi(model_s.rxns, 'biomass_reaction');
+        biomassRxnInd = strncmpi(model_s.rxns, 'biomass', 7);
         biomassRxn = model_s.rxns(biomassRxnInd);
-        atpDM = model_s.rxns(strncmp(model_s.rxns, 'DM_atp', 6) | strcmp(model_s.rxns, 'ATPM'));
+        atpDMInd = strncmp(model_s.rxns, 'DM_atp', 6) | strcmp(model_s.rxns, 'ATPM');
         model_s = changeRxnBounds(model_s, biomassRxn, blb, 'l'); %Force biomass and ATP demand to be active
-        core = [biomassRxn, atpDM];
+        core = model_s.rxns(biomassRxnInd | atpDMInd);
         figName = [figName,'B'];
     end
     if strcmp(bb, 'F')
@@ -107,21 +112,20 @@ if strcmp(figName,'S')
         figName = [figName,'F'];
     end
     expressionCol_s = mapExpressionToReactions(model_s, expressionData_s);
-    run_MBA(core, model_s, expressionCol_s, figName, ths.p10, ths.p10, 1, modelName, tol, cellLine)
-    run_MBA(core, model_s, expressionCol_s, figName, ths.mean, ths.mean, 2, modelName, tol, cellLine)
-    run_MBA(core, model_s, expressionCol_s, figName, ths.p25, ths.p25, 3, modelName, tol, cellLine)
-    run_MBA(core, model_s, expressionCol_s, figName, ths.p50, ths.p50, 4, modelName, tol, cellLine)
-    run_MBA(core, model_s, expressionCol_s, figName, ths.mean, ths.p10, 5, modelName, tol, cellLine)
-    run_MBA(core, model_s, expressionCol_s, figName, ths.p25, ths.p10, 6, modelName, tol, cellLine)
-    run_MBA(core, model_s, expressionCol_s, figName, ths.p50, ths.p10, 7, modelName, tol, cellLine)
-    run_MBA(core, model_s, expressionCol_s, figName, ths.p25, ths.mean, 8, modelName, tol, cellLine)
-    run_MBA(core, model_s, expressionCol_s, figName, ths.p50, ths.mean, 9, modelName, tol, cellLine)
-    run_MBA(core, model_s, expressionCol_s, figName, ths.p50, ths.p25, 10, modelName, tol, cellLine)
+    run_MBA(core, model_s, expressionCol_s, figName, ths.p10, ths.p10, 1, modelName, tol, cellLine, overWrite)
+    run_MBA(core, model_s, expressionCol_s, figName, ths.mean, ths.mean, 2, modelName, tol, cellLine, overWrite)
+    run_MBA(core, model_s, expressionCol_s, figName, ths.p25, ths.p25, 3, modelName, tol, cellLine, overWrite)
+    run_MBA(core, model_s, expressionCol_s, figName, ths.p50, ths.p50, 4, modelName, tol, cellLine, overWrite)
+    run_MBA(core, model_s, expressionCol_s, figName, ths.mean, ths.p10, 5, modelName, tol, cellLine, overWrite)
+    run_MBA(core, model_s, expressionCol_s, figName, ths.p25, ths.p10, 6, modelName, tol, cellLine, overWrite)
+    run_MBA(core, model_s, expressionCol_s, figName, ths.p50, ths.p10, 7, modelName, tol, cellLine, overWrite)
+    run_MBA(core, model_s, expressionCol_s, figName, ths.p25, ths.mean, 8, modelName, tol, cellLine, overWrite)
+    run_MBA(core, model_s, expressionCol_s, figName, ths.p50, ths.mean, 9, modelName, tol, cellLine, overWrite)
+    run_MBA(core, model_s, expressionCol_s, figName, ths.p50, ths.p25, 10, modelName, tol, cellLine, overWrite)
 end
-exit;
 end
 
-function run_MBA(core, model, expressionCol, figName, mt, ut, id, modName, tol, cellLine)
+function run_MBA(core, model, expressionCol, figName, mt, ut, id, modName, tol, cellLine, overWrite)
     tName = ['MBA','_',figName, num2str(id),'_',modName];
     disp(tName)
     
@@ -134,14 +138,19 @@ function run_MBA(core, model, expressionCol, figName, mt, ut, id, modName, tol, 
     biomassMetSinksInd = contains(NC, 'BMS_'); 
     CM = union(CM, NC(biomassMetSinksInd));
     
-    try
-        cMod = MBA(model, CM, CH, tol);
-        disp(['Number of rxns: ',num2str(numel(cMod.rxns))])
-        cMod.name = tName;
-        writeCbModel(cMod, 'mat', tName);
-    catch ME
-        warning('Failed to run MBA on model %s, figure %s with cell line %s', modelName, [figName num2str(id)], cellLine);
-        warning(ME.message)
+    if (~overWrite && exist([pwd '/' tName '.mat'], 'file') ~=2)
+        overWrite = 1;
+    end
+    if (overWrite)
+        try
+            cMod = MBA(model, CM, CH, tol);
+            disp(['Number of rxns: ',num2str(numel(cMod.rxns))])
+            cMod.name = tName;
+            writeCbModel(cMod, 'mat', tName);
+        catch ME
+            warning('Failed to run MBA on model %s, figure %s with cell line %s', modelName, [figName num2str(id)], cellLine);
+            warning(ME.message)
+        end
     end
         
 end
