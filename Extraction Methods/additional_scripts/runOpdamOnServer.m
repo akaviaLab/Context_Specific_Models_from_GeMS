@@ -1,13 +1,11 @@
 function runOpdamOnServer(extractionMethod, figName, bbLetter, modelName, cellLine)
-
-addpath('/gs/home/uda2013/cobratoolbox/'); % So matlab on the server has cobratoolbox
-initCobraToolbox;
 %changeCobraSolver('ibm_cplex', 'all') % Glpk fails when using CheckModelConsistency (on the server?)
 % give number of workers for parallelization
-pc = parcluster('local');
-pc.JobStorageLocation = strcat('/localscratch/', getenv('PBS_JOBID')); % Which directory are the threads using to communicate
-nworkers = str2double(getenv('PBS_NUM_PPN'));
-parpool(pc, nworkers) % starts the parallel pool
+% pc = parcluster('local');
+% mkdir(strcat('/localscratch/', getenv('SLURM_JOBID')));
+% pc.JobStorageLocation = strcat('/localscratch/', getenv('SLURM_JOBID')); % Which directory are the threads using to communicate
+% nworkers = str2double(getenv('SLURM_JOB_NUM_NODES')); %PBS_NUM_PPN
+% parpool(pc, nworkers) % starts the parallel pool
 
 numberModels = 4;
 

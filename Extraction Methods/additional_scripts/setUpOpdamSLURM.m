@@ -49,7 +49,7 @@ for method = methodsToGenerateModels
                 fprintf(fid, 'addpath(''%s''); ', cobraToolboxPath); % So matlab on the server has cobratoolbox
                 fprintf(fid, 'initCobraToolbox; ');
                 fprintf(fid, 'addpath(genpath(''%s'')); ', opdamRemoteDirectory);
-                fprintf(fid, 'runOpdamOnServer %s, %s, %s ''%s'' %s; \"\n', method{:}, currentFig{:}, currentbb{:}, modelName, cellLine);
+                fprintf(fid, 'runOpdamOnServer %s %s %s ''%s'' %s; \"\n', method{:}, currentFig{:}, currentbb{:}, modelName, cellLine);
                 fclose(fid);
                 fprintf(fidSubmission, 'sbatch %s\n', shFileName);
             end

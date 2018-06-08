@@ -36,7 +36,7 @@ if strcmp(figName,'U')
         biomassRxnInd = strncmpi(model_u.rxns, 'biomass', 7);
         atpDMInd = strncmp(model_u.rxns, 'DM_atp', 6) | strcmp(model_u.rxns, 'ATPM');
         model_u = changeRxnBounds(model_u, model_u.rxns(biomassRxnInd), blb, 'l'); %Force biomass and ATP demand to be active
-        core = model_u.rxns(biomassRxnInd | atpDMInd);
+        core = find(biomassRxnInd | atpDMInd);
         figName = [figName,'B'];
     end
     if strcmp(bb,'F')
@@ -59,7 +59,7 @@ if strcmp(figName,'C')
         biomassRxnInd = strncmpi(model_u.rxns, 'biomass', 7);
         atpDMInd = strncmp(model_c.rxns, 'DM_atp', 6) | strcmp(model_c.rxns, 'ATPM');
         model_c = changeRxnBounds(model_c, model_c.rxns(biomassRxnInd), blb, 'l'); %Force biomass and ATP demand to be active
-        core = model_c.rxns(biomassRxnInd | atpDMInd);
+        core = find(biomassRxnInd | atpDMInd);
         figName = [figName,'B'];
     end
     if strcmp(bb,'F')
@@ -70,7 +70,7 @@ if strcmp(figName,'C')
         biomassRxnInd = strncmpi(model_u.rxns, 'biomass', 7);
         atpDMInd = strncmp(model_c.rxns, 'DM_atp', 6) | strcmp(model_c.rxns, 'ATPM');
         model_c = changeRxnBounds(model_c, model_c.rxns(biomassRxnInd), 1e-3, 'l'); %Force biomass and ATP demand to be active
-        core = model_c.rxns(biomassRxnInd | atpDMInd);
+        core = find(biomassRxnInd | atpDMInd);
         figName = [figName,'H'];
     end
     epsil = 1e-8;
@@ -89,7 +89,7 @@ if strcmp(figName,'S')
         biomassRxnInd = strcmpi(model_s.rxns, 'biomass_reaction');
         atpDMInd = strncmp(model_s.rxns, 'DM_atp', 6) | strcmp(model_s.rxns, 'ATPM');
         model_s = changeRxnBounds(model_s, model_s.rxns(biomassRxnInd), blb, 'l'); %Force biomass and ATP demand to be active
-        core = model_s.rxns(biomassRxnInd | atpDMInd);
+        core = find(biomassRxnInd | atpDMInd);
         figName = [figName,'B'];
     end
     if strcmp(bb,'F')
