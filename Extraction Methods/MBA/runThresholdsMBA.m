@@ -83,8 +83,8 @@ run_MBA(core, model, expressionCol, figName, ths.p50, ths.mean, 9, modelName, to
 run_MBA(core, model, expressionCol, figName, ths.p50, ths.p25, 10, modelName, tol, cellLine, overWrite)
 end
 
-function run_MBA(core, model, expressionCol, figName, mt, ut, id, modName, tol, cellLine, overWrite)
-    tName = ['MBA','_',figName, num2str(id),'_',modName];
+function run_MBA(core, model, expressionCol, figName, mt, ut, id, modelName, tol, cellLine, overWrite)
+    tName = ['MBA', '_', figName, num2str(id), '_', cellLine, '_', modelName];
     disp(tName)
     
     indH = find(expressionCol > ut);

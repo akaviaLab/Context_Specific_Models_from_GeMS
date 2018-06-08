@@ -81,7 +81,7 @@ run_fastcore(core, expressionCol, figName, model, epsil, scaling, ths.p50, 4, mo
 end
 
 function run_fastcore(core, expressionCol, figName, model, epsil, scaling, th, id, modelName, cellLine, overWrite)
-tName = ['fastcore_',modelName, '_', figName, num2str(id),'_',cellLine];
+tName = ['fastcore_', figName, num2str(id), '_', cellLine, '_', modelName];
 disp(tName)
 C = find(expressionCol >= th);
 C = union(C, core);

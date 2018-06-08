@@ -91,7 +91,7 @@ run_iMat(core, model, expressionCol, figName, epsil, ths.p50, ths.p25, 10, model
 end
 
 function run_iMat(core, model, expressionCol, figName, epsil, lb, ub, id, modelName, tol, runtime, cellLine, overWrite)
-    tName = ['iMAT_',figName, num2str(id),'_',modelName,'_',cellLine];
+    tName = ['iMAT_', figName, num2str(id), '_', cellLine, '_', modelName];
     disp(tName)
     paramConsistency.epsilon=tol;
     paramConsistency.modeFlag=0;

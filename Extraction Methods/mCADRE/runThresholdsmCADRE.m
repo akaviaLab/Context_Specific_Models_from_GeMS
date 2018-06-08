@@ -80,7 +80,7 @@ singleRun(core, model, ths.p50, 1, 1/2, figName, 4, modelName, tol, expressionCo
 end
 
 function singleRun(core, model, ht, mcheck, eta, figName, id, modelName, tol, expressionCol, cellLine, overWrite)
-    tName = ['mCADRE_',modelName, '_', cellLine, '_', figName, num2str(id)];
+    tName = ['mCADRE_', figName, num2str(id), '_', cellLine, '_', modelName];
     disp(tName)
     disp('RUNNING mCADRE...')
      

@@ -58,7 +58,7 @@ singleRun(model, expressionCol, ths.p50, 0.9, figName, 4, modelName, cellLine, t
 end
 
 function singleRun(model, expressionCol, ut, obj_frac, figName, id, modelName, cellLine, tol, overWrite)
-    tName = ['GIMME_',modelName, '_', figName, num2str(id),'_',cellLine];
+    tName = ['GIMME_', figName, num2str(id), '_', cellLine, '_', modelName];
     disp(tName)
     disp('RUNNING GIMME...')
     optionsLocal = struct('solver', 'GIMME', 'expressionRxns', {expressionCol},...

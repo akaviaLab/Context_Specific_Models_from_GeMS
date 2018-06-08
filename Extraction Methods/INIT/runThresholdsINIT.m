@@ -127,7 +127,7 @@ run_INIT(model, ths.mean, figName, epsil, w4, 4, modelName, tol, runtime, cellLi
 end
 
 function run_INIT(model, ~, figName, epsil, w, id, modelName, tol, runtime, cellLine, overWrite)
-    tName = ['INIT_',figName, num2str(id),'_',modelName,'_',cellLine];
+    tName = ['INIT_',figName, num2str(id), '_', cellLine, '_', modelName];
     disp(tName)
     optionsLocal = struct('weights', {w}, 'tol', tol, 'runtime', runtime', ...
         'epsilon', epsil, 'solver', 'INIT', 'logfile', [tName,'.txt']);
