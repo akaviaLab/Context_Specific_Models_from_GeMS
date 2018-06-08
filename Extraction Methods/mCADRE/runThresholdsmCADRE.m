@@ -29,86 +29,54 @@ expressionData_c.value(1:length(indNum)) = num(indNum, 2);
 expressionData_s.gene(1:length(indModel)) = model_s.genes(indModel);
 expressionData_s.value(1:length(indNum)) = num(indNum, 2);
 
-    if strcmp(figName,'U')
-        tol = 1e-6;
-        core = {};
-        if strcmp(bb,'B')
-            biomassRxnInd = strcmpi(model_u.rxns, 'biomass_reaction');
-            biomassRxn = model_u.rxns(biomassRxnInd);
-            atpDM = model_u.rxns(strncmp(model_u.rxns, 'DM_atp', 6) | strcmp(model_u.rxns, 'ATPM'));
-            model_u = changeRxnBounds(model_u, biomassRxn, blb, 'l'); %Force biomass and ATP demand to be active
-            core = [biomassRxn, atpDM];
-            figName = [figName,'B'];
-        end
-        if strcmp(bb,'F')
-            model_u = addBiomassSinks(model_u);
-            figName = [figName,'F'];
-            bmi = strcmpi(model_u.rxns, 'biomass_reaction');
-            model_u.rxns{bmi} = 'Biomass_reaction_rename';
-        end
-        disp('UNCONSTRAINED MODEL')
-        expressionCol_u = mapExpressionToReactions(model_u, expressionData_u);
-        singleRun(core, model_u,  ths.p10, 1, 1/3, figName, 1, modelName, tol, expressionCol_u, cellLine, overWrite)
-        singleRun(core, model_u,  ths.mean, 1, 1/3, figName, 2, modelName, tol, expressionCol_u, cellLine, overWrite)
-        singleRun(core, model_u,  ths.p25, 1, 1/3, figName, 3, modelName, tol, expressionCol_u, cellLine, overWrite)
-        singleRun(core, model_u,  ths.p50, 1, 1/3, figName, 4, modelName, tol, expressionCol_u, cellLine, overWrite)
-    end
-    if strcmp(figName,'C')
-        tol = 1e-8;
-        disp('CONSTRAINED MODEL')
-        core = {};
-        if strcmp(bb,'B')
-            biomassRxnInd = strcmpi(model_c.rxns, 'biomass_reaction');
-            biomassRxn = model_c.rxns(biomassRxnInd);
-            atpDM = model_c.rxns(strncmp(model_c.rxns, 'DM_atp', 6) | strcmp(model_c.rxns, 'ATPM'));
-            model_c = changeRxnBounds(model_c, biomassRxn, blb, 'l'); %Force biomass and ATP demand to be active
-            core = [biomassRxn, atpDM];
-            figName = [figName,'B'];
-        end
-        if strcmp(bb,'F')
-            model_c = addBiomassSinks(model_c);
-            figName = [figName,'F'];
-            bmi = strcmpi(model_c.rxns, 'biomass_reaction');
-            model_c.rxns{bmi} = 'Biomass_reaction_rename';
-        end
-        if strcmp(bb,'H')
-            biomassRxnInd = strcmpi(model_c.rxns, 'biomass_reaction');
-            biomassRxn = model_c.rxns{biomassRxnInd};
-            atpDM = model_c.rxns(strncmp(model_c.rxns, 'DM_atp', 6) | strcmp(model_c.rxns, 'ATPM'));
-            model_c = changeRxnBounds(model_c, biomassRxn, 1e-3, 'l'); %Force biomass and ATP demand to be active
-            core = [biomassRxn, atpDM];            
-            figName = [figName,'H'];
-        end
-        expressionCol_c = mapExpressionToReactions(model_c, expressionData_c);
-        singleRun(core, model_c, ths.p10, 1, 1/3, figName, 1, modelName, tol, expressionCol_c, cellLine, overWrite)
-        singleRun(core, model_c, ths.mean, 1, 1/3, figName, 2, modelName, tol, expressionCol_c, cellLine, overWrite)
-        singleRun(core, model_c, ths.p25, 1, 1/3, figName, 3, modelName, tol, expressionCol_c, cellLine, overWrite)
-        singleRun(core, model_c, ths.p50, 1, 1/2, figName, 4, modelName, tol, expressionCol_c, cellLine, overWrite)
-    end
-    if strcmp(figName,'S')
-        tol = 1e-6;
-        core = {};
-        if strcmp(bb,'B')
-            biomassRxnInd = strcmpi(model_s.rxns, 'biomass_reaction');
-            biomassRxn = model_s.rxns(biomassRxnInd);
-            atpDM = model_s.rxns(strncmp(model_s.rxns, 'DM_atp', 6) | strcmp(model_s.rxns, 'ATPM'));
-            model_s = changeRxnBounds(model_s, biomassRxn, blb, 'l'); %Force biomass and ATP demand to be active
-            core = [biomassRxn, atpDM];
-            figName = [figName,'B'];
-        end
-        if strcmp(bb,'F')
-            model_s = addBiomassSinks(model_s);
-            figName = [figName,'F'];
-            bmi = strcmpi(model_s.rxns, 'biomass_reaction');
-            model_s.rxns{bmi} = 'Biomass_reaction_rename';
-        end
-        disp('SEMI-CONSTRAINED MODEL')
-        expressionCol_s = mapExpressionToReactions(model_s, expressionData_s);
-        singleRun(core, model_s, ths.p10, 1, 1/3, figName, 1, modelName, tol, expressionCol_s, cellLine, overWrite)
-        singleRun(core, model_s, ths.mean, 1, 1/3, figName, 2, modelName, tol, expressionCol_s, cellLine, overWrite)
-        singleRun(core, model_s, ths.p25, 1, 1/3, figName, 3, modelName, tol, expressionCol_s, cellLine, overWrite)
-        singleRun(core, model_s, ths.p50, 1, 1/3, figName, 4, modelName, tol, expressionCol_s, cellLine, overWrite)
-    end
+if strcmp(figName,'U')
+    tol = 1e-6;
+    disp('UNCONSTRAINED MODEL')
+    expressionCol = mapExpressionToReactions(model_u, expressionData_u);
+    model = model_u;
+end
+if strcmp(figName,'C')
+    tol = 1e-8;
+    disp('CONSTRAINED MODEL')
+    expressionCol = mapExpressionToReactions(model_c, expressionData_c);
+    model = model_c;
+end
+if strcmp(figName,'S')
+    tol = 1e-6;
+    disp('SEMI-CONSTRAINED MODEL')
+    expressionCol = mapExpressionToReactions(model_s, expressionData_s);
+    model = model_s;
+end
+
+core = {};
+if strcmp(bb,'B')
+    biomassRxnInd = strcmpi(model.rxns, 'biomass_reaction');
+    biomassRxn = model.rxns(biomassRxnInd);
+    atpDM = model.rxns(strncmp(model.rxns, 'DM_atp', 6) | strcmp(model.rxns, 'ATPM'));
+    model = changeRxnBounds(model, biomassRxn, blb, 'l'); %Force biomass and ATP demand to be active
+    core = [biomassRxn, atpDM];
+    figName = [figName,'B'];
+end
+if strcmp(bb,'F')
+    model = addBiomassSinks(model);
+    figName = [figName,'F'];
+    bmi = strcmpi(model.rxns, 'biomass_reaction');
+    model.rxns{bmi} = 'Biomass_reaction_rename';
+end
+if strcmp(bb,'H')
+    biomassRxnInd = strcmpi(model.rxns, 'biomass_reaction');
+    biomassRxn = model.rxns{biomassRxnInd};
+    atpDM = model.rxns(strncmp(model.rxns, 'DM_atp', 6) | strcmp(model.rxns, 'ATPM'));
+    model = changeRxnBounds(model, biomassRxn, 1e-3, 'l'); %Force biomass and ATP demand to be active
+    core = [biomassRxn, atpDM];
+    figName = [figName,'H'];
+end
+
+singleRun(core, model, ths.p10, 1, 1/3, figName, 1, modelName, tol, expressionCol, cellLine, overWrite)
+singleRun(core, model, ths.mean, 1, 1/3, figName, 2, modelName, tol, expressionCol, cellLine, overWrite)
+singleRun(core, model, ths.p25, 1, 1/3, figName, 3, modelName, tol, expressionCol, cellLine, overWrite)
+singleRun(core, model, ths.p50, 1, 1/2, figName, 4, modelName, tol, expressionCol, cellLine, overWrite)
+
 end
 
 function singleRun(core, model, ht, mcheck, eta, figName, id, modelName, tol, expressionCol, cellLine, overWrite)

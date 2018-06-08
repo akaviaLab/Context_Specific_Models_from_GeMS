@@ -29,36 +29,32 @@ expressionData_c.value(1:length(indNum)) = num(indNum, 2);
 expressionData_s.gene(1:length(indModel)) = model_s.genes(indModel);
 expressionData_s.value(1:length(indNum)) = num(indNum, 2);
 
-    if strcmp(figName,'U')
-        tol = 1e-6;
-        figName = [figName,'B'];
-        disp('UNCONSTRAINED MODEL')
-        expressionCol_u = mapExpressionToReactions(model_u, expressionData_u);
-        singleRun(model_u, expressionCol_u, ths.p10, 0.9, figName, 1, modelName, cellLine, tol, overWrite)
-        singleRun(model_u, expressionCol_u, ths.mean, 0.9, figName, 2, modelName, cellLine, tol, overWrite)
-        singleRun(model_u, expressionCol_u, ths.p25, 0.9, figName, 3, modelName, cellLine, tol, overWrite)
-        singleRun(model_u, expressionCol_u, ths.p50, 0.9, figName, 4, modelName, cellLine, tol, overWrite)
-    end
-    if strcmp(figName,'C')
-        tol = 1e-8;
-        disp('CONSTRAINED MODEL')
-        figName = [figName,'B'];
-        expressionCol_c = mapExpressionToReactions(model_c, expressionData_c);
-        singleRun(model_c, expressionCol_c, ths.p10, 0.9, figName, 1, modelName, cellLine, tol, overWrite)
-        singleRun(model_c, expressionCol_c, ths.mean, 0.9, figName, 2, modelName, cellLine, tol, overWrite)
-        singleRun(model_c, expressionCol_c, ths.p25, 0.9, figName, 3, modelName, cellLine, tol, overWrite)
-        singleRun(model_c, expressionCol_c, ths.p50, 0.9, figName, 4, modelName, cellLine, tol, overWrite)
-    end
-    if strcmp(figName,'S')
-        tol = 1e-6;
-        disp('SEMI-CONSTRAINED MODEL')
-        figName = [figName,'B'];
-        expressionCol_s = mapExpressionToReactions(model_s, expressionData_s);
-        singleRun(model_s, expressionCol_s, ths.p10, 0.9, figName, 1, modelName, cellLine, tol, overWrite)
-        singleRun(model_s, expressionCol_s, ths.mean, 0.9, figName, 2, modelName, cellLine, tol, overWrite)
-        singleRun(model_s, expressionCol_s, ths.p25, 0.9, figName, 3, modelName, cellLine, tol, overWrite)
-        singleRun(model_s, expressionCol_s, ths.p50, 0.9, figName, 4, modelName, cellLine, tol, overWrite)
-    end
+if strcmp(figName,'U')
+    tol = 1e-6;
+    disp('UNCONSTRAINED MODEL')
+    expressionCol = mapExpressionToReactions(model_u, expressionData_u);
+    model = model_u;
+end
+if strcmp(figName,'C')
+    tol = 1e-8;
+    disp('CONSTRAINED MODEL')
+    figName = [figName,'B'];
+    expressionCol = mapExpressionToReactions(model_c, expressionData_c);
+    model = model_c;
+end
+if strcmp(figName,'S')
+    tol = 1e-6;
+    disp('SEMI-CONSTRAINED MODEL')
+    figName = [figName,'B'];
+    expressionCol = mapExpressionToReactions(model_s, expressionData_s);
+    model = model_s;
+end
+
+figName = [figName,'B'];
+singleRun(model, expressionCol, ths.p10, 0.9, figName, 1, modelName, cellLine, tol, overWrite)
+singleRun(model, expressionCol, ths.mean, 0.9, figName, 2, modelName, cellLine, tol, overWrite)
+singleRun(model, expressionCol, ths.p25, 0.9, figName, 3, modelName, cellLine, tol, overWrite)
+singleRun(model, expressionCol, ths.p50, 0.9, figName, 4, modelName, cellLine, tol, overWrite)
 end
 
 function singleRun(model, expressionCol, ut, obj_frac, figName, id, modelName, cellLine, tol, overWrite)

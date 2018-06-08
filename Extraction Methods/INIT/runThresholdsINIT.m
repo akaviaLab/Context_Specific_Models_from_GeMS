@@ -30,66 +30,51 @@ expressionData_s.gene(1:length(indModel)) = model_s.genes(indModel);
 expressionData_s.value(1:length(indNum)) = num(indNum, 2);
 
 if strcmp(figName,'U')
+    %UNCONSTRAINED
+    epsil = 1;
     tol = 1e-6;
     runtime = 3600;
-    if strcmp(bb,'B')
-        biomassRxnInd = strncmpi(model_u.rxns, 'biomass', 7);
-        biomassRxn = model_u.rxns(biomassRxnInd);
-        atpDMInd = strncmp(model_u.rxns, 'DM_atp', 6) | strcmp(model_u.rxns, 'ATPM');
-        model = changeRxnBounds(model_u, biomassRxn, blb, 'l'); %Force biomass and ATP demand to be active
-        figName = [figName,'B'];
-    end
-    if strcmp(bb,'F')
-        model = addBiomassSinks(model_u);
-        bmsInd=~cellfun(@isempty,strfind(model.rxns,'BMS_'));
-        figName = [figName,'F'];
-    end
     expressionCol = mapExpressionToReactions(model_u, expressionData_u);
+    model = model_u;
 end
 
 if strcmp(figName,'C')
+    % CONSTRAINED
+    epsil = 1e-6;
     tol = 1e-8;
     runtime = 7200;
-    if strcmp(bb,'B')
-        biomassRxnInd = strncmpi(model_c.rxns, 'biomass', 7);
-        biomassRxn = model_c.rxns(biomassRxnInd);
-        atpDMInd = strncmp(model_c.rxns, 'DM_atp', 6) | strcmp(model_c.rxns, 'ATPM');
-        model = changeRxnBounds(model_c, biomassRxn, blb, 'l'); %Force biomass and ATP demand to be active
-        figName = [figName,'B'];
-    end
-    if strcmp(bb,'F')
-        model = addBiomassSinks(model_c);
-        bmsInd=~cellfun(@isempty,strfind(model.rxns,'BMS_'));
-        figName = [figName,'F'];
-    end
-    if strcmp(bb,'H')
-        biomassRxnInd = strncmpi(model_c.rxns, 'biomass', 7);
-        biomassRxn = model_c.rxns(biomassRxnInd);
-        atpDMInd = strncmp(model_c.rxns, 'DM_atp', 6) | strcmp(model_c.rxns, 'ATPM');
-        model = changeRxnBounds(model_c, biomassRxn, 1e-3, 'l'); %Force biomass and ATP demand to be active
-        figName = [figName,'H'];
-    end
     expressionCol = mapExpressionToReactions(model_c, expressionData_c);
+    model = model_c;    
 end
 
 if strcmp(figName,'S')
+    %SEMI-CONSTRAINED
+    epsil = 1;
     tol = 1e-6;
     runtime = 3600;
-    if strcmp(bb,'B')
-        biomassRxnInd = strncmpi(model_s.rxns, 'biomass', 7);
-        biomassRxn = model_s.rxns(biomassRxnInd);
-        atpDMInd = strncmp(model_s.rxns, 'DM_atp', 6) | strcmp(model_s.rxns, 'ATPM');
-        model = changeRxnBounds(model_s, biomassRxn, blb, 'l'); %Force biomass and ATP demand to be active
-        figName = [figName,'B'];
-    end
-    if strcmp(bb,'F')
-        model = addBiomassSinks(model_s);
-        bmsInd=~cellfun(@isempty,strfind(model.rxns,'BMS_'));
-        figName = [figName,'F'];
-    end
     expressionCol = mapExpressionToReactions(model_s, expressionData_s);
+    model = model_s;
 end
 
+if strcmp(bb,'B')
+    biomassRxnInd = strncmpi(model.rxns, 'biomass', 7);
+    biomassRxn = model.rxns(biomassRxnInd);
+    atpDMInd = strncmp(model.rxns, 'DM_atp', 6) | strcmp(model.rxns, 'ATPM');
+    model = changeRxnBounds(model, biomassRxn, blb, 'l'); %Force biomass and ATP demand to be active
+    figName = [figName,'B'];
+end
+if strcmp(bb,'F')
+    model = addBiomassSinks(model);
+    bmsInd=~cellfun(@isempty,strfind(model.rxns,'BMS_'));
+    figName = [figName,'F'];
+end
+if strcmp(bb,'H')
+    biomassRxnInd = strncmpi(model.rxns, 'biomass', 7);
+    biomassRxn = model.rxns(biomassRxnInd);
+    atpDMInd = strncmp(model.rxns, 'DM_atp', 6) | strcmp(model.rxns, 'ATPM');
+    model = changeRxnBounds(model, biomassRxn, 1e-3, 'l'); %Force biomass and ATP demand to be active
+    figName = [figName,'H'];
+end
 
 %w1
 w1 = zeros(length(expressionCol),1);
@@ -134,33 +119,11 @@ if strcmp(bb,'B') || strcmp(bb,'H')
 else
     w4(bmsInd) = 0;
 end
-    
-if strcmp(figName,'UB') || strcmp(figName,'UF')
-    %UNCONSTRAINED
-    epsil = 1;
-    run_INIT(model,ths.p25, figName, epsil, w1, 1, modelName, tol, runtime, cellLine, overWrite);
-    run_INIT(model,ths.p50, figName, epsil, w2, 2, modelName, tol, runtime, cellLine, overWrite);
-    run_INIT(model,ths.p10, figName, epsil, w3, 3, modelName, tol, runtime, cellLine, overWrite);
-    run_INIT(model,ths.mean, figName, epsil, w4, 4, modelName, tol, runtime, cellLine, overWrite);
-end
 
-if strcmp(figName,'CB') || strcmp(figName,'CF') || strcmp(figName,'CH')
-    %CONSTRAINED
-    epsil = 1e-6;
-    run_INIT(model,ths.p25, figName, epsil, w1, 1, modelName, tol, runtime, cellLine, overWrite);
-    run_INIT(model,ths.p50, figName, epsil, w2, 2, modelName, tol, runtime, cellLine, overWrite);
-    run_INIT(model,ths.p10, figName, epsil, w3, 3, modelName, tol, runtime, cellLine, overWrite);
-    run_INIT(model,ths.mean, figName, epsil, w4, 4, modelName, tol, runtime, cellLine, overWrite);
-end
-if strcmp(figName,'SB') || strcmp(figName,'SF')
-    %SEMI-CONSTRAINED
-    epsil = 1;
-    run_INIT(model,ths.p25, figName, epsil, w1, 1, modelName, tol, runtime, cellLine, overWrite);
-    run_INIT(model,ths.p50, figName, epsil, w2, 2, modelName, tol, runtime, cellLine, overWrite);
-    run_INIT(model,ths.p10, figName, epsil, w3, 3, modelName, tol, runtime, cellLine, overWrite);
-    run_INIT(model,ths.mean, figName, epsil, w4, 4, modelName, tol, runtime, cellLine, overWrite);
-
-end
+run_INIT(model, ths.p25, figName, epsil, w1, 1, modelName, tol, runtime, cellLine, overWrite);
+run_INIT(model, ths.p50, figName, epsil, w2, 2, modelName, tol, runtime, cellLine, overWrite);
+run_INIT(model, ths.p10, figName, epsil, w3, 3, modelName, tol, runtime, cellLine, overWrite);
+run_INIT(model, ths.mean, figName, epsil, w4, 4, modelName, tol, runtime, cellLine, overWrite);
 end
 
 function run_INIT(model, ~, figName, epsil, w, id, modelName, tol, runtime, cellLine, overWrite)
