@@ -1,5 +1,5 @@
 function runOpdamOnServer(extractionMethod, figName, bbLetter, modelName, cellLine)
-%changeCobraSolver('ibm_cplex', 'all') % Glpk fails when using CheckModelConsistency (on the server?)
+changeCobraSolver('ibm_cplex', 'all') % Glpk fails when using CheckModelConsistency (on the server?)
 % give number of workers for parallelization
 % pc = parcluster('local');
 % mkdir(strcat('/localscratch/', getenv('SLURM_JOBID')));
