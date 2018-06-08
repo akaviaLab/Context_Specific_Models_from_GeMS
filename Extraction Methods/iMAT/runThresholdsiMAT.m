@@ -108,7 +108,7 @@ if strcmp(figName,'S')
     if strcmp(bb,'B')
         biomassRxnInd = strcmpi(model_s.rxns, 'biomass_reaction');
         biomassRxn = model_s.rxns(biomassRxnInd);
-        atpDMInd = model_s.rxns(strncmp(model_s.rxns, 'DM_atp', 6) | strcmp(model_s.rxns, 'ATPM'));
+        atpDMInd = strncmp(model_s.rxns, 'DM_atp', 6) | strcmp(model_s.rxns, 'ATPM');
         model_s = changeRxnBounds(model_s, biomassRxn, blb, 'l'); %Force biomass and ATP demand to be active
         core = model_s.rxns(biomassRxnInd | atpDMInd);
         figName = [figName,'B'];

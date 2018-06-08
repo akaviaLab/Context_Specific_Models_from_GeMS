@@ -56,7 +56,7 @@ if strcmp(figName,'C')
     %CONSTRAINED
     core = [];
     if strcmp(bb,'B')
-        biomassRxnInd = strncmpi(model_u.rxns, 'biomass', 7);
+        biomassRxnInd = strncmpi(model_c.rxns, 'biomass', 7);
         atpDMInd = strncmp(model_c.rxns, 'DM_atp', 6) | strcmp(model_c.rxns, 'ATPM');
         model_c = changeRxnBounds(model_c, model_c.rxns(biomassRxnInd), blb, 'l'); %Force biomass and ATP demand to be active
         core = find(biomassRxnInd | atpDMInd);
@@ -67,7 +67,7 @@ if strcmp(figName,'C')
         figName = [figName,'F'];
     end
     if strcmp(bb,'H')
-        biomassRxnInd = strncmpi(model_u.rxns, 'biomass', 7);
+        biomassRxnInd = strncmpi(model_c.rxns, 'biomass', 7);
         atpDMInd = strncmp(model_c.rxns, 'DM_atp', 6) | strcmp(model_c.rxns, 'ATPM');
         model_c = changeRxnBounds(model_c, model_c.rxns(biomassRxnInd), 1e-3, 'l'); %Force biomass and ATP demand to be active
         core = find(biomassRxnInd | atpDMInd);
