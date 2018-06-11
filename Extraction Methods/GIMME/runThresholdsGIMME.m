@@ -38,14 +38,12 @@ end
 if strcmp(figName,'C')
     tol = 1e-8;
     disp('CONSTRAINED MODEL')
-    figName = [figName,'B'];
     expressionCol = mapExpressionToReactions(model_c, expressionData_c);
     model = model_c;
 end
 if strcmp(figName,'S')
     tol = 1e-6;
     disp('SEMI-CONSTRAINED MODEL')
-    figName = [figName,'B'];
     expressionCol = mapExpressionToReactions(model_s, expressionData_s);
     model = model_s;
 end
@@ -58,7 +56,7 @@ singleRun(model, expressionCol, ths.p50, 0.9, figName, 4, modelName, cellLine, t
 end
 
 function singleRun(model, expressionCol, ut, obj_frac, figName, id, modelName, cellLine, tol, overWrite)
-    tName = ['GIMME_', figName, num2str(id), '_', cellLine, '_', modelName];
+    tName = ['GIMME_', cellLine, '_', figName, num2str(id), '_', modelName];
     disp(tName)
     disp('RUNNING GIMME...')
     optionsLocal = struct('solver', 'GIMME', 'expressionRxns', {expressionCol},...

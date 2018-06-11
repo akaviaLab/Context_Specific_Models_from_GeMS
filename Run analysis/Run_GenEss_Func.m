@@ -1,4 +1,4 @@
-function [mEssGenes, mNonGenes, GenEss_score,Func_score] = Run_GenEss_Func(contextSpecificModelName,CellLine, constrainedModelFile)
+function [mEssGenes, mNonGenes, GenEss_score,Func_score] = Run_GenEss_Func(contextSpecificModelName,CellLine, modelName)
 %Run_GenEss_Func Performs analysis for Gene essentiality and Metabolic
 %capabilities
 %linearMOMA
@@ -39,9 +39,16 @@ end
 % TODO should rate be different?
 maxgr=0.01;
 tmBcRed = tmB;
+if (all(tmBcRed.c == 0))
+    warning('No objective reaction %s was found in model %s!\n', tmBcRed.biomassRxnAbbr);
+    mEssGenes = NaN;
+    mNonGenes = NaN;
+    GenEss_score = NaN;
+    Func_score = NaN;
+    return;
+end
 %TODO - think about if lower bound for biomass should be zero
 tmBcRed = changeRxnBounds(tmBcRed,tmBcRed.rxns(tmBcRed.c == 1),0,'l');
-% See if it can use toolbox version
 grRatios = singleGeneDeletion(tmBcRed,'FBA',depl_p.genes);
 
 essentialGemeInd = grRatios <= maxgr;
@@ -52,7 +59,13 @@ mNonP = depl_p.values(nonEssentialGemeInd);
 mEssGenes = depl_p.genes(essentialGemeInd);
 mNonGenes = depl_p.genes(nonEssentialGemeInd);
 
+try
 GenEss_score = ranksum(mEssP,mNonP,'tail','left');
+catch ME
+warning('ranksum failed with error');
+warning(ME.message)
+GenEss_score = NaN;
+end
 % Not really clear what testFunctionality is trying to do. Should
 % probably read original paper
 [totTest, numTests] = testFunctionality(tmB);
@@ -89,7 +102,8 @@ function [totTest, numTests] = testFunctionality(model)
     
     warning off all
     nm = addReaction(model,'BMS_atp(c)',{'atp[c]','h2o[c]','adp[c]','pi[c]','h[c]'},[-0.5,-0.5,0.5,0.5,0.5],false,0,1000,0,'Biomass Metabolite Sink'); %Make a copy of ATP demand
-    nm = changeRxnBounds(nm, 'DM_atp_c_',0,'l');
+    atpDMInd = strncmp(model.rxns, 'DM_atp', 6) | strcmp(model.rxns, 'ATPM'); 
+    nm = changeRxnBounds(nm, model.rxns(atpDMInd) ,0,'l');
     warning on all
     nm = changeObjective(nm, 'BMS_atp(c)');
     sol = optimizeCbModel(nm);

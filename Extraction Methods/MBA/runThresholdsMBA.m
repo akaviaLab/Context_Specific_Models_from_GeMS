@@ -52,11 +52,11 @@ end
 
 core = {};
 if strcmp(bb, 'B')
-    biomassRxnInd = strncmpi(model.rxns, 'biomass', 7);
-    biomassRxn = model.rxns(biomassRxnInd);
-    atpDMInd = strncmp(model.rxns, 'DM_atp', 6) | strcmp(model.rxns, 'ATPM');
+    biomassRxn = model.rxns(strcmpi(model.rxns, 'biomass_reaction'));
     model = changeRxnBounds(model, biomassRxn, blb, 'l'); %Force biomass and ATP demand to be active
-    core = model.rxns(biomassRxnInd | atpDMInd);
+    biomassRxnsInd = strncmpi(model.rxns, 'biomass', 7);
+    atpDMInd = strncmp(model.rxns, 'DM_atp', 6) | strcmp(model.rxns, 'ATPM');
+    core = model.rxns(biomassRxnsInd | atpDMInd);
     figName = [figName,'B'];
 end
 if strcmp(bb, 'F')
@@ -64,13 +64,14 @@ if strcmp(bb, 'F')
     figName = [figName,'F'];
 end
 if strcmp(bb, 'H')
-    biomassRxnInd = strncmpi(model.rxns, 'biomass', 7);
-    biomassRxn = model.rxns(biomassRxnInd);
-    atpDMInd = strncmp(model.rxns, 'DM_atp', 6) | strcmp(model.rxns, 'ATPM');
+    biomassRxn = model.rxns(strcmpi(model.rxns, 'biomass_reaction'));
     model = changeRxnBounds(model, biomassRxn, 1e-3, 'l'); %Force biomass and ATP demand to be active
-    core = model.rxns(biomassRxnInd | atpDMInd);
+    biomassRxnsInd = strncmpi(model.rxns, 'biomass', 7);
+    atpDMInd = strncmp(model.rxns, 'DM_atp', 6) | strcmp(model.rxns, 'ATPM');
+    core = model.rxns(biomassRxnsInd | atpDMInd);
     figName = [figName,'H'];
 end
+
 run_MBA(core, model, expressionCol, figName, ths.p10, ths.p10, 1, modelName, tol, cellLine, overWrite)
 run_MBA(core, model, expressionCol, figName, ths.mean, ths.mean, 2, modelName, tol, cellLine, overWrite)
 run_MBA(core, model, expressionCol, figName, ths.p25, ths.p25, 3, modelName, tol, cellLine, overWrite)
@@ -84,7 +85,7 @@ run_MBA(core, model, expressionCol, figName, ths.p50, ths.p25, 10, modelName, to
 end
 
 function run_MBA(core, model, expressionCol, figName, mt, ut, id, modelName, tol, cellLine, overWrite)
-    tName = ['MBA', '_', figName, num2str(id), '_', cellLine, '_', modelName];
+    tName = ['MBA', '_', cellLine, '_', figName, num2str(id), '_', modelName];
     disp(tName)
     
     indH = find(expressionCol > ut);

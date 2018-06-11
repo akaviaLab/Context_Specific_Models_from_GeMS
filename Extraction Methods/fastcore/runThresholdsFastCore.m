@@ -55,10 +55,11 @@ end
 
 core = [];
 if strcmp(bb,'B')
-    biomassRxnInd = strncmpi(model.rxns, 'biomass', 7);
+    biomassRxn = model.rxns(strcmpi(model.rxns, 'biomass_reaction'));
+    model = changeRxnBounds(model, model.rxns(biomassRxn), blb, 'l'); %Force biomass and ATP demand to be active
     atpDMInd = strncmp(model.rxns, 'DM_atp', 6) | strcmp(model.rxns, 'ATPM');
-    model = changeRxnBounds(model, model.rxns(biomassRxnInd), blb, 'l'); %Force biomass and ATP demand to be active
-    core = find(biomassRxnInd | atpDMInd);
+    biomassRxnsInd = strncmpi(model.rxns, 'biomass', 7);
+    core = find(biomassRxnsInd | atpDMInd);
     figName = [figName,'B'];
 end
 if strcmp(bb,'F')
@@ -66,10 +67,11 @@ if strcmp(bb,'F')
     figName = [figName,'F'];
 end
 if strcmp(bb,'H')
-    biomassRxnInd = strncmpi(model.rxns, 'biomass', 7);
+    biomassRxn = model.rxns(strcmpi(model.rxns, 'biomass_reaction'));
+    model = changeRxnBounds(model, model.rxns(biomassRxn), 1e-3, 'l'); %Force biomass and ATP demand to be active
+    biomassRxnsInd = strncmpi(model.rxns, 'biomass', 7);
     atpDMInd = strncmp(model.rxns, 'DM_atp', 6) | strcmp(model.rxns, 'ATPM');
-    model = changeRxnBounds(model, model.rxns(biomassRxnInd), 1e-3, 'l'); %Force biomass and ATP demand to be active
-    core = find(biomassRxnInd | atpDMInd);
+    core = find(biomassRxnsInd | atpDMInd);
     figName = [figName,'H'];
 end
 
@@ -81,7 +83,7 @@ run_fastcore(core, expressionCol, figName, model, epsil, scaling, ths.p50, 4, mo
 end
 
 function run_fastcore(core, expressionCol, figName, model, epsil, scaling, th, id, modelName, cellLine, overWrite)
-tName = ['fastcore_', figName, num2str(id), '_', cellLine, '_', modelName];
+tName = ['fastcore_', cellLine, '_', figName, num2str(id), '_', modelName];
 disp(tName)
 C = find(expressionCol >= th);
 C = union(C, core);
@@ -95,7 +97,7 @@ if (overWrite)
         cMod.name = tName;
         writeCbModel(cMod, 'mat', tName);
     catch ME
-        warning('Failed to run fastcore on model %s, figure %s with cell line %s', modelName, [figName num2str(id)], cellLine);
+        warning('Failed fastcore on model %s, figure %s with cell line %s', modelName, [figName num2str(id)], cellLine);
         warning(ME.message)
     end
 end

@@ -36,14 +36,14 @@ for method = methodsToGenerateModels
     timeToRun = 48;
     if (any(strcmp(method, {'mCADRE', 'MBA', 'iMAT'})))
         for currentFig = figures
-            bbs = {'F', 'B'};
+            bbs = {'B'}; % Deleted 'F' type, since it is designed (according to article) to remove the biomass function. Not sure what is the point of this.
             if(strcmp(currentFig{:}, 'C'))
-                bbs = {'F', 'B', 'H'};
+                bbs = {'B', 'H'};
             end
             for currentbb = bbs
                 shFileName = sprintf('subTh_%s_%s_%s_%s.sh', method{:}, modelName, cellLine, strcat(currentFig{:}, currentbb{:}));
                 fid = fopen(shFileName, 'w');
-                fprintf(fid, '#!/bin/bash\n#SBATCH -t 0-%d:00\n#SBATCH --ntasks=4\n#SBATCH --mem-per-cpu=1024M\n#SBATCH --output=%%x-%%j.out\n\n\n\n', timeToRun);
+                fprintf(fid, '#!/bin/bash\n#SBATCH -t 0-%d:00\n#SBATCH --ntasks=3\n#SBATCH --mem-per-cpu=2048M\n#SBATCH --output=%%x-%%j.out\n\n\n\n', timeToRun);
                 fprintf(fid, 'cd %s\n', [outputRemotePrefix outputName]);
                 fprintf(fid, 'matlab -nodisplay -r \"');
                 fprintf(fid, 'addpath(''%s''); ', cobraToolboxPath); % So matlab on the server has cobratoolbox
@@ -57,7 +57,7 @@ for method = methodsToGenerateModels
     else
         shFileName = sprintf('subTh_%s_%s_%s.sh', method{:}, modelName, cellLine);
         fid = fopen(shFileName, 'w');
-        fprintf(fid, '#!/bin/bash\n#SBATCH -t 0-%d:00\n#SBATCH --ntasks=4\n#SBATCH --mem-per-cpu=1024M\n#SBATCH --output=%%x-%%j.out\n\n\n\n', timeToRun);
+        fprintf(fid, '#!/bin/bash\n#SBATCH -t 0-%d:00\n#SBATCH --ntasks=4\n#SBATCH --mem-per-cpu=1536M\n#SBATCH --output=%%x-%%j.out\n\n\n\n', timeToRun);
         fprintf(fid, 'cd %s\n', [outputRemotePrefix outputName]);
         fprintf(fid, 'matlab -nodisplay -r \"');
         fprintf(fid, 'addpath(''%s''); ', cobraToolboxPath); % So matlab on the server has cobratoolbox
