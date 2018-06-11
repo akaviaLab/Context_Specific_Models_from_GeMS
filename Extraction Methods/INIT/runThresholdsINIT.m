@@ -57,10 +57,9 @@ if strcmp(figName,'S')
 end
 
 if strcmp(bb,'B')
-    biomassRxnInd = strncmpi(model.rxns, 'biomass', 7);
-    biomassRxn = model.rxns(biomassRxnInd);
-    atpDMInd = strncmp(model.rxns, 'DM_atp', 6) | strcmp(model.rxns, 'ATPM');
+    biomassRxn = model.rxns(strcmpi(model.rxns, 'biomass_reaction'));
     model = changeRxnBounds(model, biomassRxn, blb, 'l'); %Force biomass and ATP demand to be active
+    atpDMInd = strncmp(model.rxns, 'DM_atp', 6) | strcmp(model.rxns, 'ATPM');
     figName = [figName,'B'];
 end
 if strcmp(bb,'F')
@@ -69,20 +68,20 @@ if strcmp(bb,'F')
     figName = [figName,'F'];
 end
 if strcmp(bb,'H')
-    biomassRxnInd = strncmpi(model.rxns, 'biomass', 7);
-    biomassRxn = model.rxns(biomassRxnInd);
+    biomassRxn = model.rxns(strcmpi(model.rxns, 'biomass_reaction'));
     atpDMInd = strncmp(model.rxns, 'DM_atp', 6) | strcmp(model.rxns, 'ATPM');
     model = changeRxnBounds(model, biomassRxn, 1e-3, 'l'); %Force biomass and ATP demand to be active
     figName = [figName,'H'];
 end
 
+biomassRxnsInd = strncmpi(model.rxns, 'biomass', 7);
 %w1
 w1 = zeros(length(expressionCol),1);
 w1(expressionCol >= 0) = 5*log(expressionCol(expressionCol>=0)/ths.p10);
 w1(expressionCol < 0) = -2; % "unknown" entries get a weight of -2
 w1(w1 < -max(w1)) = -max(w1);
 if strcmp(bb,'B') || strcmp(bb,'H')
-    w1(biomassRxnInd | atpDMInd) = max(w1); %Biomass and ATP demand get high weight
+    w1(biomassRxnsInd | atpDMInd) = max(w1); %Biomass and ATP demand get high weight
 else
     w1(bmsInd) = 0;
 end
@@ -93,7 +92,7 @@ w2(expressionCol >= 0) = 5*log(expressionCol(expressionCol>=0)/ths.mean);
 w2(expressionCol < 0) = -2; % "unknown" entries get a weight of -2
 w2(w2 < -max(w2)) = -max(w2);
 if strcmp(bb,'B') || strcmp(bb,'H')
-    w2(biomassRxnInd | atpDMInd) = max(w2); %Biomass and ATP demand get high weight
+    w2(biomassRxnsInd | atpDMInd) = max(w2); %Biomass and ATP demand get high weight
 else
     w2(bmsInd) = 0;
 end
@@ -104,7 +103,7 @@ w3(expressionCol >= 0) = 5*log(expressionCol(expressionCol>=0)/ths.p25);
 w3(expressionCol < 0) = -2; % "unknown" entries get a weight of -2
 w3(w3 < -max(w3)) = -max(w3);
 if strcmp(bb,'B') || strcmp(bb,'H')
-    w3(biomassRxnInd | atpDMInd) = max(w3); %Biomass and ATP demand get high weight
+    w3(biomassRxnsInd | atpDMInd) = max(w3); %Biomass and ATP demand get high weight
 else
     w3(bmsInd) = 0;
 end
@@ -115,7 +114,7 @@ w4(expressionCol >= 0) = 5*log(expressionCol(expressionCol>=0)/ths.p50);
 w4(expressionCol < 0) = -2; % "unknown" entries get a weight of -2
 w4(w4 < -max(w4)) = -max(w4);
 if strcmp(bb,'B') || strcmp(bb,'H')
-    w4(biomassRxnInd | atpDMInd) = max(w4); %Biomass and ATP demand get high weight
+    w4(biomassRxnsInd | atpDMInd) = max(w4); %Biomass and ATP demand get high weight
 else
     w4(bmsInd) = 0;
 end
