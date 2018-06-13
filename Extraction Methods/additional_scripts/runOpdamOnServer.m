@@ -1,4 +1,4 @@
-function runOpdamOnServer(extractionMethod, figName, bbLetter, modelName, cellLine)
+function runOpdamOnServer(extractionMethod, figName, bbLetter, modelName, cellLine, overwrite)
 changeCobraSolver('ibm_cplex', 'all') % Glpk fails when using CheckModelConsistency (on the server?)
 % give number of workers for parallelization
 % pc = parcluster('local');
@@ -7,23 +7,27 @@ changeCobraSolver('ibm_cplex', 'all') % Glpk fails when using CheckModelConsiste
 % nworkers = str2double(getenv('SLURM_JOB_NUM_NODES')); %PBS_NUM_PPN
 % parpool(pc, nworkers) % starts the parallel pool
 
+if nargin < 6
+    overwrite=1;
+end
+
 numberModels = 4;
 
 switch extractionMethod
     case 'GIMME'
-        runThresholdsGIMME(figName, modelName, cellLine);
+        runThresholdsGIMME(figName, modelName, cellLine, overwrite);
     case 'fastcore'
-        runThresholdsFastCore(figName, bbLetter, modelName, cellLine);
+        runThresholdsFastCore(figName, bbLetter, modelName, cellLine, overwrite);
     case 'iMAT'
-        runThresholdsiMAT(figName, bbLetter, modelName, cellLine);
+        runThresholdsiMAT(figName, bbLetter, modelName, cellLine, overwrite);
         numberModels = 10;
     case 'INIT'
-        runThresholdsINIT(figName, bbLetter, modelName, cellLine);
+        runThresholdsINIT(figName, bbLetter, modelName, cellLine, overwrite);
     case 'MBA'
-        runThresholdsMBA(figName, bbLetter, modelName, cellLine);
+        runThresholdsMBA(figName, bbLetter, modelName, cellLine, overwrite);
         numberModels = 10;
     case 'mCADRE'
-        runThresholdsmCADRE(figName, bbLetter, modelName, cellLine);
+        runThresholdsmCADRE(figName, bbLetter, modelName, cellLine, overwrite);
 end
 
 end

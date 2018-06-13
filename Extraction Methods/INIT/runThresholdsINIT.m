@@ -138,12 +138,9 @@ function run_INIT(model, ~, figName, epsil, w, id, modelName, tol, runtime, cell
     end
     if (overWrite)
         try
-            cMod2 = createTissueSpecificModel(model, optionsLocal, 1, [], paramConsistency);
-            cMod2.name = tName;
-            writeCbModel(cMod2, 'mat', tName);
-            if (~isSameCobraModel(cMod, cMod2))
-                fprintf('When running INIT  model %s, fig %s and cell line %s, id %d, the old and new models are different!\n', modelName, figName, cellLine, id);
-            end
+            cMod = createTissueSpecificModel(model, optionsLocal, 1, [], paramConsistency);
+            cMod.name = tName;
+            writeCbModel(cMod, 'mat', tName);
         catch ME
             warning('Failed to run INIT on model %s, figure %s with cell line %s', modelName, [figName num2str(id)], cellLine);
             warning(ME.message)

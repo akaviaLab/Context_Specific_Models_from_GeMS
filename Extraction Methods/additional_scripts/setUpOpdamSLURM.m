@@ -43,7 +43,7 @@ for method = methodsToGenerateModels
             for currentbb = bbs
                 shFileName = sprintf('subTh_%s_%s_%s_%s.sh', method{:}, modelName, cellLine, strcat(currentFig{:}, currentbb{:}));
                 fid = fopen(shFileName, 'w');
-                fprintf(fid, '#!/bin/bash\n#SBATCH -t 0-%d:00\n#SBATCH --ntasks=3\n#SBATCH --mem-per-cpu=2048M\n#SBATCH --output=%%x-%%j.out\n\n\n\n', timeToRun);
+                fprintf(fid, '#!/bin/bash\n#SBATCH -t 0-%d:00\n#SBATCH --ntasks=3\n#SBATCH --mem-per-cpu=2560M\n#SBATCH --output=%%x-%%j.out\n\n\n\n', timeToRun);
                 fprintf(fid, 'cd %s\n', [outputRemotePrefix outputName]);
                 fprintf(fid, 'matlab -nodisplay -r \"');
                 fprintf(fid, 'addpath(''%s''); ', cobraToolboxPath); % So matlab on the server has cobratoolbox
@@ -57,19 +57,19 @@ for method = methodsToGenerateModels
     else
         shFileName = sprintf('subTh_%s_%s_%s.sh', method{:}, modelName, cellLine);
         fid = fopen(shFileName, 'w');
-        fprintf(fid, '#!/bin/bash\n#SBATCH -t 0-%d:00\n#SBATCH --ntasks=4\n#SBATCH --mem-per-cpu=1536M\n#SBATCH --output=%%x-%%j.out\n\n\n\n', timeToRun);
+        fprintf(fid, '#!/bin/bash\n#SBATCH -t 0-%d:00\n#SBATCH --ntasks=3\n#SBATCH --mem-per-cpu=2560M\n#SBATCH --output=%%x-%%j.out\n\n\n\n', timeToRun);
         fprintf(fid, 'cd %s\n', [outputRemotePrefix outputName]);
         fprintf(fid, 'matlab -nodisplay -r \"');
         fprintf(fid, 'addpath(''%s''); ', cobraToolboxPath); % So matlab on the server has cobratoolbox
         fprintf(fid, 'initCobraToolbox; ');
         fprintf(fid, 'addpath(genpath(''%s'')); ', opdamRemoteDirectory);
         for currentFig = figures
-            bbs = {'F', 'B'};
+            bbs = {'B'};
             if (strcmp(method, 'GIMME'))
                 fprintf(fid, 'runOpdamOnServer %s %s %s ''%s'' %s; ', method{:}, currentFig{:}, 'B', modelName, cellLine);
             else
                 if(strcmp(currentFig{:}, 'C'))
-                    bbs = {'F', 'B', 'H'};
+                    bbs = {'B', 'H'};
                 end
                 for currentbb = bbs
                     fprintf(fid, 'runOpdamOnServer %s %s %s ''%s'' %s; ', method{:}, currentFig{:}, currentbb{:}, modelName, cellLine);

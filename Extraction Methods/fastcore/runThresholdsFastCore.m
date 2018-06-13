@@ -56,7 +56,7 @@ end
 core = [];
 if strcmp(bb,'B')
     biomassRxn = model.rxns(strcmpi(model.rxns, 'biomass_reaction'));
-    model = changeRxnBounds(model, model.rxns(biomassRxn), blb, 'l'); %Force biomass and ATP demand to be active
+    model = changeRxnBounds(model, biomassRxn, blb, 'l'); %Force biomass and ATP demand to be active
     atpDMInd = strncmp(model.rxns, 'DM_atp', 6) | strcmp(model.rxns, 'ATPM');
     biomassRxnsInd = strncmpi(model.rxns, 'biomass', 7);
     core = find(biomassRxnsInd | atpDMInd);
@@ -68,7 +68,7 @@ if strcmp(bb,'F')
 end
 if strcmp(bb,'H')
     biomassRxn = model.rxns(strcmpi(model.rxns, 'biomass_reaction'));
-    model = changeRxnBounds(model, model.rxns(biomassRxn), 1e-3, 'l'); %Force biomass and ATP demand to be active
+    model = changeRxnBounds(model, biomassRxn, 1e-3, 'l'); %Force biomass and ATP demand to be active
     biomassRxnsInd = strncmpi(model.rxns, 'biomass', 7);
     atpDMInd = strncmp(model.rxns, 'DM_atp', 6) | strcmp(model.rxns, 'ATPM');
     core = find(biomassRxnsInd | atpDMInd);
