@@ -42,7 +42,7 @@ if strcmp(figName,'C')
     % CONSTRAINED
     epsil = 1e-6;
     tol = 1e-8;
-    runtime = 7200;
+    runtime = 14400;
     expressionCol = mapExpressionToReactions(model_c, expressionData_c);
     model = model_c;    
 end

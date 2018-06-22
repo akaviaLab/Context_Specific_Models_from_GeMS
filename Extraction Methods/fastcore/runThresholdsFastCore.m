@@ -87,7 +87,7 @@ tName = ['fastcore_', cellLine, '_', figName, num2str(id), '_', modelName];
 disp(tName)
 C = find(expressionCol >= th);
 C = union(C, core);
-optionsLocal = struct('solver', 'fastCore', 'core', {C}, 'epsilon', epsil);
+optionsLocal = struct('solver', 'fastCore', 'core', {C}, 'epsilon', epsil, 'printLevel', 2);
 if (~overWrite && exist([pwd '/' tName '.mat'], 'file') ~=2)
     overWrite = 1;
 end
