@@ -9,7 +9,7 @@ function modelNew=removeIsoGenes(model)
     relevantFields = setdiff(relevantFields, 'genes');
     originalGenes = model.genes;
     originalGenes = regexprep(originalGenes, '[.]\d*', '');
-    model.genes=[];
+    model.genes = [];
     model.grRules = regexprep(model.grRules, '[.]\d*', '');
     warning off all
     model = buildRxnGeneMat(model);

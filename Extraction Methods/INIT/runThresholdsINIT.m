@@ -33,7 +33,7 @@ if strcmp(figName,'U')
     %UNCONSTRAINED
     epsil = 1;
     tol = 1e-6;
-    runtime = 3600;
+    runtime = 7200;
     expressionCol = mapExpressionToReactions(model_u, expressionData_u);
     model = model_u;
 end
@@ -51,7 +51,7 @@ if strcmp(figName,'S')
     %SEMI-CONSTRAINED
     epsil = 1;
     tol = 1e-6;
-    runtime = 3600;
+    runtime = 7200;
     expressionCol = mapExpressionToReactions(model_s, expressionData_s);
     model = model_s;
 end

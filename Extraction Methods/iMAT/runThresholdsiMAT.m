@@ -41,7 +41,7 @@ end
 if strcmp(figName,'C')
     %CONSTRAINED
     tol = 1e-8;
-    runtime = 14400;
+    runtime = 14400; % Works with 32 CPUs, 96G of memory, otherwise, can take longer
     epsil = 1e-6;
     expressionCol = mapExpressionToReactions(model_c, expressionData_c);
     model = model_c;
@@ -50,7 +50,7 @@ end
 if strcmp(figName,'S')
     %SEMI-CONSTRAINED
     tol = 1e-6;
-    runtime = 3600;
+    runtime = 7200;
     epsil = 1;
     expressionCol = mapExpressionToReactions(model_s, expressionData_s);
     model = model_s;

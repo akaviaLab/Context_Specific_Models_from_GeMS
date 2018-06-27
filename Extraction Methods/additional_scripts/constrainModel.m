@@ -79,7 +79,7 @@ function new_model = constrainModel(model, constr,cellType)
     
     %Remove isoforms to make genes unique and also remove genes no longer
     %mapping to any reaction
-    new_model = removeIsoGenes(new_model);
+    %new_model = removeIsoGenes(new_model);
     
     %Remove inconsistent reactions
     activeRxns = fastcc(new_model, tol);
